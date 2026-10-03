@@ -47,9 +47,15 @@ def trip_pressure_range(syringe, F_set=None):
     """Pressure at which a force trip set to F_set actually fires, for friction +/- FRICTION_UNCERTAINTY (mmHg, low/nominal/high)."""
     s = SYRINGES[syringe]; F_set = trip_force(syringe) if F_set is None else F_set
     return tuple((F_set - (s["friction"] + df)) / (s["area_mm2"] * 1e-6) / 133.322 for df in (FRICTION_UNCERTAINTY, 0.0, -FRICTION_UNCERTAINTY))
-TRIP_SENSE_TRAVEL = 0.3    # mm stem retraction at which the sear releases (rev 3; was 3.0 mm of direct stem travel)
+# rev 4: sensing travel derived from the modelled sear geometry (cad_model.trip_mechanism):
+SEAR_GAP = 0.15            # mm free gap between the stem trip pin and the sear tail (armed)
+SEAR_OVERLAP = 0.9         # mm overlap of the sear hook lip over the flag-rod collar
+SEAR_RATIO = 9.0 / 2.0     # hook-lip motion per tail motion (hook lever 9 mm / tail lever 2 mm about the vertical pivot)
+TRIP_SENSE_TRAVEL = SEAR_GAP + SEAR_OVERLAP / SEAR_RATIO   # = 0.35 mm stem retraction at which the collar is released
 TRIP_TRAVEL = TRIP_SENSE_TRAVEL
-FLAG_TRAVEL = 12.0         # mm travel of the spring-loaded flag rod released by the sear (raises flag + balance-blocking rail)
+FLAG_TRAVEL = 6.0          # mm rise of the spring-loaded flag rod (cross pin enters the stem capture slot; lifts the trip rail)
+STOP_FORK_FREE_PLAY_DEG = 4.8   # balance free play inside the two-pin stop fork (pins at 80/100 deg, r = 18 mm; spoke 2.5 mm wide)
+SLEEVE_STOP_MM = 7.0       # lost-motion cap of the under-deck sleeve that carries the stop fork
 FLAG_SPRING_N = 2.0        # N flag-rod spring (energy stored when the LOAD/RUN lever re-cocks it)
 SPRING_DRUM_D = 25.0       # mm drum diameter
 TRAVEL = 95.0              # mm carriage travel (covers 20 mL BD stroke 69.6 mm + loading margin)

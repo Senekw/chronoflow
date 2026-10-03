@@ -151,10 +151,10 @@
   "per_syringe": {
    "BD 5 mL": {
     "trip_force_N": 6.0688570668530435,
-    "spacer_preload_N": 5.168857066853043,
-    "spacer_preload_mm": 1.7229523556176811,
-    "sense_travel_force_rise_N": 0.8999999999999999,
-    "sense_rise_mmHg_if_uncompensated": 59.095742337584596,
+    "spacer_preload_N": 5.018857066853044,
+    "spacer_preload_mm": 1.6729523556176813,
+    "sense_travel_force_rise_N": 1.0499999999999998,
+    "sense_rise_mmHg_if_uncompensated": 68.94503272718202,
     "full_3mm_rise_mmHg": 590.957423375846,
     "pressure_band_mmHg": [
      201.5070961040257,
@@ -165,15 +165,15 @@
      -32.83096796532477,
      32.83096796532479
     ],
-    "stored_displacement_at_sear_mL": 0.03426934089537393,
+    "stored_displacement_at_sear_mL": 0.039980897711269586,
     "stored_displacement_3mm_mL": 0.34269340895373934
    },
    "BD 10 mL": {
     "trip_force_N": 8.604637112295435,
-    "spacer_preload_N": 7.704637112295435,
-    "spacer_preload_mm": 2.568212370765145,
-    "sense_travel_force_rise_N": 0.8999999999999999,
-    "sense_rise_mmHg_if_uncompensated": 40.88036865755396,
+    "spacer_preload_N": 7.554637112295436,
+    "spacer_preload_mm": 2.5182123707651454,
+    "sense_travel_force_rise_N": 1.0499999999999998,
+    "sense_rise_mmHg_if_uncompensated": 47.69376343381294,
     "full_3mm_rise_mmHg": 408.8036865755396,
     "pressure_band_mmHg": [
      231.8660522374101,
@@ -184,15 +184,15 @@
      -22.711315920863306,
      22.711315920863306
     ],
-    "stored_displacement_at_sear_mL": 0.04953898915629405,
+    "stored_displacement_at_sear_mL": 0.057795487349009717,
     "stored_displacement_3mm_mL": 0.49538989156294055
    },
    "BD 20 mL": {
     "trip_force_N": 14.495897851322658,
-    "spacer_preload_N": 13.595897851322658,
-    "spacer_preload_mm": 4.531965950440886,
-    "sense_travel_force_rise_N": 0.8999999999999999,
-    "sense_rise_mmHg_if_uncompensated": 23.48663875513953,
+    "spacer_preload_N": 13.445897851322659,
+    "spacer_preload_mm": 4.481965950440887,
+    "sense_travel_force_rise_N": 1.0499999999999998,
+    "sense_rise_mmHg_if_uncompensated": 27.40107854766278,
     "full_3mm_rise_mmHg": 234.86638755139532,
     "pressure_band_mmHg": [
      260.8556020747675,
@@ -203,15 +203,15 @@
      -13.04813264174417,
      13.048132641744182
     ],
-    "stored_displacement_at_sear_mL": 0.08622656314278707,
+    "stored_displacement_at_sear_mL": 0.10059765699991825,
     "stored_displacement_3mm_mL": 0.8622656314278708
    },
    "BD 30 mL": {
     "trip_force_N": 18.292188203609022,
-    "spacer_preload_N": 17.392188203609024,
-    "spacer_preload_mm": 5.797396067869674,
-    "sense_travel_force_rise_N": 0.8999999999999999,
-    "sense_rise_mmHg_if_uncompensated": 18.252877551552842,
+    "spacer_preload_N": 17.24218820360902,
+    "spacer_preload_mm": 5.747396067869674,
+    "sense_travel_force_rise_N": 1.0499999999999998,
+    "sense_rise_mmHg_if_uncompensated": 21.295023810144983,
     "full_3mm_rise_mmHg": 182.52877551552848,
     "pressure_band_mmHg": [
      269.57853741407854,
@@ -222,15 +222,15 @@
      -10.140487528640485,
      10.140487528640474
     ],
-    "stored_displacement_at_sear_mL": 0.11095084234866733,
+    "stored_displacement_at_sear_mL": 0.12944264940677855,
     "stored_displacement_3mm_mL": 1.109508423486673
    },
    "BD 60 mL": {
     "trip_force_N": 26.89419619968748,
-    "spacer_preload_N": 25.994196199687483,
-    "spacer_preload_mm": 8.664732066562495,
-    "sense_travel_force_rise_N": 0.8999999999999999,
-    "sense_rise_mmHg_if_uncompensated": 12.056695296961271,
+    "spacer_preload_N": 25.84419619968748,
+    "spacer_preload_mm": 8.614732066562494,
+    "sense_travel_force_rise_N": 1.0499999999999998,
+    "sense_rise_mmHg_if_uncompensated": 14.066144513121483,
     "full_3mm_rise_mmHg": 120.56695296961271,
     "pressure_band_mmHg": [
      279.9055078383979,
@@ -241,16 +241,16 @@
      -6.698164053867384,
      6.6981640538673615
     ],
-    "stored_displacement_at_sear_mL": 0.16797074901132206,
+    "stored_displacement_at_sear_mL": 0.1959658738465424,
     "stored_displacement_3mm_mL": 1.6797074901132205
    }
   },
   "spring_rate_N_per_mm": 3.0,
-  "sense_travel_mm": 0.3,
-  "flag_travel_mm": 12.0,
+  "sense_travel_mm": 0.35,
+  "flag_travel_mm": 6.0,
   "preload_range_N": [
-   5.168857066853043,
-   25.994196199687483
+   5.018857066853044,
+   25.84419619968748
   ],
   "friction_uncertainty_N": 1.5
  },

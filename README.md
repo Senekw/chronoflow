@@ -2,7 +2,7 @@
 
 **An electricity-free, volumetric, clockwork-governed syringe infusion driver for neonatal care in low-resource settings.**
 
-Design-and-simulation study: parametric 3D CAD (66 parts, interference-checked), physics-based validation, LaTeX manuscript, ISEF abstract and a bench validation protocol. *No physical prototype has been built yet.*
+Design-and-simulation study: parametric 3D CAD (91 parts, interference-checked in 12 poses), physics-based validation, LaTeX manuscript, ISEF abstract and a bench validation protocol. *No physical prototype has been built yet.*
 
 ![overview](figures/manuscript/fig1.png)
 
@@ -15,6 +15,8 @@ Two design results carry the project:
 
 Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %); flow-restriction pumps: +45 % at 37 °C, −33 % at 100 mmHg back-pressure. Escapement torque margin ≥ 2.0× over all 5 syringes × 4 cassettes × 0–300 mmHg. BOM ≈ $40.
 
+**Revision 4** (external review round 5): the snap-action occlusion trip is now fully modelled in CAD (keyed spacer, trip pin, sear on a vertical pivot, 2 N flag rod, rocker-driven capture pin, trip rail on parallel-motion cranks, drop rod and balance stop fork) in an *armed* and a *tripped* pose, and the stem capture is verified on the solids; the band clamps are slotted (hanger plate + bracket, M3 screws); a mechanism-level escapement analysis (`analysis_arm_mechanism.py`, Fig. 3) derives impulse and unlatch energies from geometry, integrates the wheel through re-cocking and sizes a compliant wheel detent (now in CAD); the interference check uses an explicit pair whitelist over 12 poses with a carriage-posed gear train; all 91 STLs are watertight; the figure scripts run standalone (`figstyle.py`). See `docs/ChronoFlow_Report.md` for the itemised log.
+
 **Revision 2** (external review): drive spring 30 → 44.5 N (the 60 mL syringe stalled before its occlusion trip at 30 N), snap-action occlusion trip (0.3 mm sensing travel to a sear, stem captured, 12 mm sprung flag rod) with spacer preload keyed to the syringe cradle insert and a disclosed friction-dependent pressure band, both band clamps slotted for symmetric coarse regulation, ribbon modelled at the true 38.1 µm stock thickness with a 22 mm half-band, mesh count corrected (rack mesh at 0.95 plus six printed gear meshes at 0.92, not seven at 0.92). See `docs/ChronoFlow_Report.md` §Revision 2.
 
 ## Repository layout
@@ -25,11 +27,13 @@ Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %)
 | `analysis/analysis_crossspring.py` | beam-column FE of the rejected cross-spring pivot |
 | `analysis/analysis_escapement.py` | RK4 balance–escapement simulator (lever vs spring-arm) |
 | `analysis/analysis_system.py` | flow tables, sweeps, operating map, Monte-Carlo, BOM → `results/`, analysis figures |
-| `analysis/make_panels.py` | manuscript figure panels + composition (needs the figure-style/figure-composer helpers) |
+| `analysis/analysis_arm_mechanism.py` | mechanism-level escapement: impulse/unlatch energies from geometry, wheel re-cock ODE, detent impact, rate sensitivity |
+| `analysis/make_panels.py`, `make_fig6.py` | manuscript figure panels + composition |
+| `analysis/figstyle.py` | standalone copy of the plotting helpers (`apply_figure_style`, `panel_letter`, `compose_figure`, …) used when the kernel plugins are absent |
 | `cad/cad_model.py` | CadQuery parametric model → STEP / glTF / STL |
-| `cad/check_interference.py` | pairwise OCC Boolean interference check |
-| `cad/render_cad.py` | OpenGL-free painter's renderer for the part meshes |
-| `cad/chronoflow_assembly.step`, `.glb`, `cad/stl/` | exported geometry (STLs are print-ready; cassettes for all four rates included) |
+| `cad/check_interference.py` | pairwise OCC Boolean interference check: explicit allowed-pair list, 12 poses, trip-capture functional check → `results/interference_report.json`, `results/trip_capture_check.json` |
+| `cad/render_cad.py`, `cad/make_renders.py` | OpenGL-free painter's renderer and the script that renders the manuscript CAD panels (armed + tripped manifests) |
+| `cad/chronoflow_assembly.step`, `.glb`, `cad/stl/`, `cad/stl_tripped/` | exported geometry (all STLs watertight; tripped pose exported for the figure) |
 | `viewer/chronoflow_viewer.html` | self-contained three.js viewer (orbit, click-to-identify, hide deck, explode) |
 | `manuscript/chronoflow.tex` | full manuscript (figures in `manuscript/figures/`) |
 | `docs/` | long-form design report and ISEF-format abstract |
@@ -40,15 +44,22 @@ Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %)
 conda create -n chronoflow python=3.11 numpy scipy pandas matplotlib trimesh -c conda-forge
 conda activate chronoflow && pip install cadquery
 cd analysis && python analysis_system.py          # results/*.csv|json + figures/analysis/*.png
-cd ../cad && python cad_model.py                  # STEP + glTF (≈10 s)
+python analysis_arm_mechanism.py                  # results/arm_mechanism.json + fig7
+python make_fig6.py && python make_panels.py      # manuscript figure panels + composed figures
+cd ../cad && python cad_model.py                  # STEP + glTF + STLs (armed and tripped) + manifests (≈15 s)
+python check_interference.py                      # 12-pose interference check + trip-capture check (≈2.5 min)
+python make_renders.py                            # CAD panels for Fig. 1a and Fig. 7a–e
 ```
-`make_panels.py` composes the manuscript figures and expects the `apply_figure_style`, `panel_letter` and `compose_figure` helpers from the figure-style / figure-composer skills to be in the namespace.
+The figure scripts import the plotting helpers from `analysis/figstyle.py` when the figure-style / figure-composer kernel plugins are not loaded, so they run from a plain shell. Run the scripts from their own directory (they resolve `results/`, `figures/` and `panels/` relative to the repository root as laid out here).
 
-## Key numbers (from `results/system_results.json`)
-- Oscillator: k = 0.296 mN·m/rad, I = 5.20e-06 kg·m², f = 1.2017 Hz, trims at 26.6 mm, regulation -2.2 … +3.2 %
-- Escapement: T_min = 9.5 µN·m, worst margin 1.80×, power 15–275 µW
-- Structure: rack-pinion tooth stress 15.3 MPa (SF 3.3)
-- Energy: 2.85 J per wind, 0.37 J used in 20 h
+## Key numbers (from `results/*.json`, regenerated with this revision)
+- Oscillator: k = 0.295 mN·m/rad, I = 5.18e-06 kg·m², f = 1.2017 Hz, trims at 26.4 mm, regulation -2.4 … +3.1 %, orientation ±0.19 %, band stress 166 MPa
+- Escapement: T_min = 9.5 µN·m, worst margin 2.04× (BD 60 mL, 1 mL/h, 300 mmHg), torque 19.5–476 µN·m, power 17–416 µW; rate error 0.057 % at Q = 150
+- Mechanism level: re-cock + lock ≤ 0.14 s vs 0.77 s budget (worst 1 mL/h, margin 5.5×); unlatch 0.10–0.35 µJ (µ 0.1–0.4); surplus ≤ 98 µJ/beat → detent impact 0.62 N / 19 MPa with the flexure detent (14 N / 92 MPa if rigid); period error 0.050–0.106 % over E_imp ±10 % and the unlatch range
+- Occlusion trip: sensing travel 0.35 mm (sear geometry), preloads 5.0–25.8 N, flag travel 6 mm; capture check: pin engagement 1.45 mm, stem advanced 0.1 mm → 0.085 mm³ pin/stem interference (captured); balance free at ±0.04 rad, blocked at ±0.08 rad inside the fork
+- Structure: rack-pinion tooth stress 22.7 MPa (SF 2.2)
+- Energy: 4.23 J per wind, 0.37 J used in 20 h
+- CAD: 91 parts, 0 interference faults in 12 poses (20 allowed pairs with reasons), 91/91 STLs watertight
 
 ## Status and limitations
 All performance figures are model predictions. The balance quality factor in air and printed-gear efficiencies are the least certain inputs (both swept). The spring-arm escapement in the CAD is a representative embodiment that will need bench iteration. See `docs/ChronoFlow_Report.md` §5–6 for the validation protocol and limitations.

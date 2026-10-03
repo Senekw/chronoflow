@@ -1,0 +1,16 @@
+{
+ "armed_pin_stem_overlap_mm3": 0.0,
+ "armed_pin_tip_minus_stem_top_mm": 0.5,
+ "tripped_pin_stem_overlap_mm3": 0.0,
+ "tripped_pin_engagement_mm": 1.446,
+ "tripped_stem_advanced_0.1mm_overlap_mm3": 0.0847,
+ "tripped_stem_advanced_0.2mm_overlap_mm3": 0.235,
+ "tripped_balance_+0.04rad_fork_overlap_mm3": 0.0,
+ "tripped_balance_+0.08rad_fork_overlap_mm3": 1.5837,
+ "tripped_balance_-0.04rad_fork_overlap_mm3": 0.0,
+ "tripped_balance_-0.08rad_fork_overlap_mm3": 1.5837,
+ "armed_balance_+0.60rad_fork_overlap_mm3": 0.0,
+ "sense_travel_mm": 0.35,
+ "flag_travel_mm": 6.0,
+ "xc": 178.79
+}

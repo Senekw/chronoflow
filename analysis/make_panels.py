@@ -1,10 +1,15 @@
 """Render the data/schematic panels of the manuscript figures at exact slot pixel sizes, then compose.
-Requires the figure-style and figure-composer kernel plugins (apply_figure_style, panel_letter,
-compose_figure, META_GREY) to be loaded in the kernel that exec()s this file."""
+Figure helpers (apply_figure_style, panel_letter, compose_figure, META_GREY) come from the figure-style /
+figure-composer kernel plugins when present, otherwise from the bundled figstyle.py (rev 4)."""
 import json, importlib, numpy as np, pandas as pd
 import matplotlib as mpl, matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Rectangle, FancyArrowPatch, Polygon, FancyBboxPatch, Wedge
 import design_params as dp, analysis_oscillator as ao, analysis_escapement as ae, analysis_crossspring as acs
+try:                      # figure helpers: kernel plugins (figure-style / figure-composer) or the standalone fallback
+    apply_figure_style
+except NameError:
+    import os as _os, sys as _sys; _sys.path.append(_os.path.dirname(_os.path.abspath(__file__)) if "__file__" in globals() else _os.getcwd())
+    from figstyle import apply_figure_style, panel_letter, META_GREY, end_of_line_labels, compose_figure, panel_px
 for m in (dp, ao, ae, acs): importlib.reload(m)
 
 DPI = 300

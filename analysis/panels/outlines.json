@@ -1,0 +1,321 @@
+{
+ "fig1": {
+  "claim": "A spring-driven, clockwork-governed syringe driver meters volume, so the delivered rate is independent of fluid temperature and back-pressure.",
+  "width_mm": 180,
+  "ncol": 12,
+  "row_heights_mm": [
+   78,
+   50
+  ],
+  "panels": [
+   {
+    "letter": "a",
+    "role": "hero",
+    "row": 0,
+    "col": 0,
+    "colspan": 7,
+    "chart_family": "CAD render, labelled",
+    "message": "What the machine is",
+    "data_vid": null,
+    "ask": "labelled isometric render"
+   },
+   {
+    "letter": "b",
+    "role": "schematic",
+    "row": 0,
+    "col": 7,
+    "colspan": 5,
+    "chart_family": "block diagram",
+    "message": "Energy and metering chain",
+    "data_vid": null,
+    "ask": "power flow: spring -> carriage -> rack -> train -> cassette -> escapement -> balance"
+   },
+   {
+    "letter": "c",
+    "role": "primary",
+    "row": 1,
+    "col": 0,
+    "colspan": 6,
+    "chart_family": "line",
+    "message": "Temperature/viscosity independence",
+    "data_vid": null,
+    "ask": "flow error vs temperature, restriction pump vs ChronoFlow"
+   },
+   {
+    "letter": "d",
+    "role": "primary",
+    "row": 1,
+    "col": 6,
+    "colspan": 6,
+    "chart_family": "line",
+    "message": "Back-pressure independence",
+    "data_vid": null,
+    "ask": "flow error vs back-pressure"
+   }
+  ]
+ },
+ "fig2": {
+  "claim": "A constant-force spring-arm escapement keeps balance amplitude and rate independent of the 18x variation in train torque that defeats a conventional lever escapement.",
+  "width_mm": 180,
+  "ncol": 12,
+  "row_heights_mm": [
+   58,
+   50
+  ],
+  "panels": [
+   {
+    "letter": "a",
+    "role": "schematic",
+    "row": 0,
+    "col": 0,
+    "colspan": 5,
+    "chart_family": "mechanism schematic",
+    "message": "How the spring-arm escapement works",
+    "data_vid": null,
+    "ask": "cock, latch, release/impulse"
+   },
+   {
+    "letter": "b",
+    "role": "primary",
+    "row": 0,
+    "col": 5,
+    "colspan": 7,
+    "chart_family": "time series",
+    "message": "Lever amplitude depends on torque; spring-arm does not",
+    "data_vid": null,
+    "ask": "theta(t) at low and high torque, both escapements"
+   },
+   {
+    "letter": "c",
+    "role": "supporting",
+    "row": 1,
+    "col": 0,
+    "colspan": 4,
+    "chart_family": "line",
+    "message": "Amplitude vs torque",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "d",
+    "role": "supporting",
+    "row": 1,
+    "col": 4,
+    "colspan": 4,
+    "chart_family": "line",
+    "message": "Period error vs torque",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "e",
+    "role": "supporting",
+    "row": 1,
+    "col": 8,
+    "colspan": 4,
+    "chart_family": "line",
+    "message": "Robust to unknown damping Q",
+    "data_vid": null,
+    "ask": "amplitude and rate error vs Q"
+   }
+  ]
+ },
+ "fig3": {
+  "claim": "A taut-band suspension gives a friction-free 1.2 Hz balance whose rate is insensitive to orientation, temperature and fatigue.",
+  "width_mm": 180,
+  "ncol": 12,
+  "row_heights_mm": [
+   52,
+   48
+  ],
+  "panels": [
+   {
+    "letter": "a",
+    "role": "schematic",
+    "row": 0,
+    "col": 0,
+    "colspan": 5,
+    "chart_family": "mechanism schematic",
+    "message": "Taut-band balance construction",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "b",
+    "role": "primary",
+    "row": 0,
+    "col": 5,
+    "colspan": 7,
+    "chart_family": "line",
+    "message": "Regulation by trim weights brackets the target",
+    "data_vid": null,
+    "ask": "frequency vs trim radius"
+   },
+   {
+    "letter": "c",
+    "role": "supporting",
+    "row": 1,
+    "col": 0,
+    "colspan": 4,
+    "chart_family": "lollipop, log",
+    "message": "Orientation sensitivity: cross-spring pivot vs taut band",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "d",
+    "role": "supporting",
+    "row": 1,
+    "col": 4,
+    "colspan": 4,
+    "chart_family": "line",
+    "message": "Band stress vs amplitude under fatigue limit",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "e",
+    "role": "supporting",
+    "row": 1,
+    "col": 8,
+    "colspan": 4,
+    "chart_family": "line",
+    "message": "Temperature drift",
+    "data_vid": null,
+    "ask": ""
+   }
+  ]
+ },
+ "fig4": {
+  "claim": "Four plug-in cassettes cover neonatal rates with torque margin and sub-microlitre resolution; predicted error is dominated by the syringe, not the mechanism.",
+  "width_mm": 180,
+  "ncol": 12,
+  "row_heights_mm": [
+   50,
+   48
+  ],
+  "panels": [
+   {
+    "letter": "a",
+    "role": "primary",
+    "row": 0,
+    "col": 0,
+    "colspan": 5,
+    "chart_family": "heatmap",
+    "message": "Flow rate per cassette and syringe",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "b",
+    "role": "supporting",
+    "row": 0,
+    "col": 5,
+    "colspan": 4,
+    "chart_family": "bar, log",
+    "message": "Torque margin at every rate",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "c",
+    "role": "supporting",
+    "row": 0,
+    "col": 9,
+    "colspan": 3,
+    "chart_family": "lollipop",
+    "message": "Per-beat resolution",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "d",
+    "role": "supporting",
+    "row": 1,
+    "col": 0,
+    "colspan": 6,
+    "chart_family": "barh",
+    "message": "Error budget",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "e",
+    "role": "supporting",
+    "row": 1,
+    "col": 6,
+    "colspan": 6,
+    "chart_family": "histogram",
+    "message": "Monte-Carlo accuracy",
+    "data_vid": null,
+    "ask": ""
+   }
+  ]
+ },
+ "fig5": {
+  "claim": "The complete 91-part assembly, including the snap-action occlusion trip and the adjustable band clamps, is fully modelled and interference-checked in 12 poses.",
+  "width_mm": 180,
+  "ncol": 12,
+  "row_heights_mm": [
+   80,
+   66
+  ],
+  "panels": [
+   {
+    "letter": "a",
+    "role": "hero",
+    "row": 0,
+    "col": 0,
+    "colspan": 6,
+    "chart_family": "CAD render",
+    "message": "Exploded view",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "b",
+    "role": "hero",
+    "row": 0,
+    "col": 6,
+    "colspan": 6,
+    "chart_family": "CAD render",
+    "message": "Escapement module with wheel detent",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "c",
+    "role": "supporting",
+    "row": 1,
+    "col": 0,
+    "colspan": 4,
+    "chart_family": "CAD render",
+    "message": "Occlusion trip, armed",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "d",
+    "role": "supporting",
+    "row": 1,
+    "col": 4,
+    "colspan": 4,
+    "chart_family": "CAD render",
+    "message": "Occlusion trip, tripped (stem captured)",
+    "data_vid": null,
+    "ask": ""
+   },
+   {
+    "letter": "e",
+    "role": "supporting",
+    "row": 1,
+    "col": 8,
+    "colspan": 4,
+    "chart_family": "CAD render",
+    "message": "Adjustable band clamps",
+    "data_vid": null,
+    "ask": ""
+   }
+  ]
+ }
+}

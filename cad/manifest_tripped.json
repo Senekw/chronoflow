@@ -1,0 +1,821 @@
+[
+ {
+  "name": "bottom plate",
+  "file": "cad_out/stl_tripped/bottom_plate.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "deck plate",
+  "file": "cad_out/stl_tripped/deck_plate.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "pillars",
+  "file": "cad_out/stl_tripped/pillars.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "feet",
+  "file": "cad_out/stl_tripped/feet.stl",
+  "color": [
+   0.1999999867257147,
+   0.1999999867257147,
+   0.1999999867257147
+  ]
+ },
+ {
+  "name": "balance window",
+  "file": "cad_out/stl_tripped/balance_window.stl",
+  "color": [
+   0.6627451562202709,
+   0.839215716262055,
+   0.898039282971279
+  ]
+ },
+ {
+  "name": "rail posts",
+  "file": "cad_out/stl_tripped/rail_posts.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "rails 6 mm",
+  "file": "cad_out/stl_tripped/rails_6_mm.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "syringe cradle + flange latch",
+  "file": "cad_out/stl_tripped/syringe_cradle_flange_latch.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "barrel clamp",
+  "file": "cad_out/stl_tripped/barrel_clamp.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "LOAD/RUN interlock lever",
+  "file": "cad_out/stl_tripped/LOAD_RUN_interlock_lever.stl",
+  "color": [
+   0.7529412403905995,
+   0.22352941663568765,
+   0.1686274426149686
+  ]
+ },
+ {
+  "name": "syringe barrel (BD 20 mL)",
+  "file": "cad_out/stl_tripped/syringe_barrel_BD_20_mL.stl",
+  "color": [
+   0.8509804759648869,
+   0.9098039711980526,
+   0.9411765167517502
+  ]
+ },
+ {
+  "name": "plunger stopper",
+  "file": "cad_out/stl_tripped/plunger_stopper.stl",
+  "color": [
+   0.1999999867257147,
+   0.1999999867257147,
+   0.1999999867257147
+  ]
+ },
+ {
+  "name": "plunger",
+  "file": "cad_out/stl_tripped/plunger.stl",
+  "color": [
+   0.8509804759648869,
+   0.9098039711980526,
+   0.9411765167517502
+  ]
+ },
+ {
+  "name": "carriage + rack",
+  "file": "cad_out/stl_tripped/carriage_rack.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "pusher head + trip stem",
+  "file": "cad_out/stl_tripped/pusher_head_trip_stem.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "trip preload spacer (4.5 mm)",
+  "file": "cad_out/stl_tripped/trip_preload_spacer_4_5_mm.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "occlusion trip spring",
+  "file": "cad_out/stl_tripped/occlusion_trip_spring.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "trip sear",
+  "file": "cad_out/stl_tripped/trip_sear.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "sear pivot pin",
+  "file": "cad_out/stl_tripped/sear_pivot_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "sear boss",
+  "file": "cad_out/stl_tripped/sear_boss.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "sear return spring",
+  "file": "cad_out/stl_tripped/sear_return_spring.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "flag rod + occlusion flag",
+  "file": "cad_out/stl_tripped/flag_rod_occlusion_flag.stl",
+  "color": [
+   0.7529412403905995,
+   0.22352941663568765,
+   0.1686274426149686
+  ]
+ },
+ {
+  "name": "flag rod guide",
+  "file": "cad_out/stl_tripped/flag_rod_guide.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "flag spring",
+  "file": "cad_out/stl_tripped/flag_spring.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "capture rocker",
+  "file": "cad_out/stl_tripped/capture_rocker.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "rocker boss",
+  "file": "cad_out/stl_tripped/rocker_boss.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "rocker pivot pin",
+  "file": "cad_out/stl_tripped/rocker_pivot_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "rocker torsion spring",
+  "file": "cad_out/stl_tripped/rocker_torsion_spring.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "stem capture pin",
+  "file": "cad_out/stl_tripped/stem_capture_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "capture pin guide",
+  "file": "cad_out/stl_tripped/capture_pin_guide.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "trip rail",
+  "file": "cad_out/stl_tripped/trip_rail.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "trip rail posts",
+  "file": "cad_out/stl_tripped/trip_rail_posts.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "trip rail cranks",
+  "file": "cad_out/stl_tripped/trip_rail_cranks.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "trip rail pivot pins",
+  "file": "cad_out/stl_tripped/trip_rail_pivot_pins.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "drop rod + balance stop fork",
+  "file": "cad_out/stl_tripped/drop_rod_balance_stop_fork.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "spring drum",
+  "file": "cad_out/stl_tripped/spring_drum.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "constant-force spring coil",
+  "file": "cad_out/stl_tripped/constant_force_spring_coil.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "drum bracket",
+  "file": "cad_out/stl_tripped/drum_bracket.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "drum axle",
+  "file": "cad_out/stl_tripped/drum_axle.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "spring tape",
+  "file": "cad_out/stl_tripped/spring_tape.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "shaft S1",
+  "file": "cad_out/stl_tripped/shaft_S1.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S2",
+  "file": "cad_out/stl_tripped/shaft_S2.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S3",
+  "file": "cad_out/stl_tripped/shaft_S3.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S4",
+  "file": "cad_out/stl_tripped/shaft_S4.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S5",
+  "file": "cad_out/stl_tripped/shaft_S5.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S6",
+  "file": "cad_out/stl_tripped/shaft_S6.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "shaft S7",
+  "file": "cad_out/stl_tripped/shaft_S7.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "P0 rack pinion",
+  "file": "cad_out/stl_tripped/P0_rack_pinion.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "W1 60T",
+  "file": "cad_out/stl_tripped/W1_60T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "P1 12T",
+  "file": "cad_out/stl_tripped/P1_12T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "W2 60T",
+  "file": "cad_out/stl_tripped/W2_60T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "P2 12T",
+  "file": "cad_out/stl_tripped/P2_12T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "W3 60T",
+  "file": "cad_out/stl_tripped/W3_60T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "P3 12T",
+  "file": "cad_out/stl_tripped/P3_12T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "W4 30T",
+  "file": "cad_out/stl_tripped/W4_30T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "P4 12T",
+  "file": "cad_out/stl_tripped/P4_12T.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "cassette g1 33T",
+  "file": "cad_out/stl_tripped/cassette_g1_33T.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "cassette g2 33T",
+  "file": "cad_out/stl_tripped/cassette_g2_33T.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "cassette g3 33T",
+  "file": "cad_out/stl_tripped/cassette_g3_33T.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "cassette g4 33T",
+  "file": "cad_out/stl_tripped/cassette_g4_33T.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "escape wheel 15T",
+  "file": "cad_out/stl_tripped/escape_wheel_15T.stl",
+  "color": [
+   0.784313768564319,
+   0.6627451562202709,
+   0.3176470728175477
+  ]
+ },
+ {
+  "name": "winding ratchet click",
+  "file": "cad_out/stl_tripped/winding_ratchet_click.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "rate cassette plate (10 mL/h)",
+  "file": "cad_out/stl_tripped/rate_cassette_plate_10_mL_h.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm A",
+  "file": "cad_out/stl_tripped/impulse_arm_A.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm A pallet pin",
+  "file": "cad_out/stl_tripped/impulse_arm_A_pallet_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "impulse arm A pivot pin",
+  "file": "cad_out/stl_tripped/impulse_arm_A_pivot_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "impulse arm A flexure",
+  "file": "cad_out/stl_tripped/impulse_arm_A_flexure.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm A post",
+  "file": "cad_out/stl_tripped/impulse_arm_A_post.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm B",
+  "file": "cad_out/stl_tripped/impulse_arm_B.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm B pallet pin",
+  "file": "cad_out/stl_tripped/impulse_arm_B_pallet_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "impulse arm B pivot pin",
+  "file": "cad_out/stl_tripped/impulse_arm_B_pivot_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "impulse arm B flexure",
+  "file": "cad_out/stl_tripped/impulse_arm_B_flexure.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "impulse arm B post",
+  "file": "cad_out/stl_tripped/impulse_arm_B_post.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "latch",
+  "file": "cad_out/stl_tripped/latch.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "wheel detent",
+  "file": "cad_out/stl_tripped/wheel_detent.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "wheel detent pin",
+  "file": "cad_out/stl_tripped/wheel_detent_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "wheel detent pivot pin",
+  "file": "cad_out/stl_tripped/wheel_detent_pivot_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "wheel detent flexure",
+  "file": "cad_out/stl_tripped/wheel_detent_flexure.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "wheel detent post",
+  "file": "cad_out/stl_tripped/wheel_detent_post.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "balance balance",
+  "file": "cad_out/stl_tripped/balance_balance.stl",
+  "color": [
+   0.18431372056832446,
+   0.43529415477129635,
+   0.6235294437687625
+  ]
+ },
+ {
+  "name": "balance trims",
+  "file": "cad_out/stl_tripped/balance_trims.stl",
+  "color": [
+   0.784313768564319,
+   0.6627451562202709,
+   0.3176470728175477
+  ]
+ },
+ {
+  "name": "balance impulse_pin",
+  "file": "cad_out/stl_tripped/balance_impulse_pin.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "balance band_upper",
+  "file": "cad_out/stl_tripped/balance_band_upper.stl",
+  "color": [
+   0.6039215980896713,
+   0.6470588972075848,
+   0.6941176948133441
+  ]
+ },
+ {
+  "name": "balance band_lower",
+  "file": "cad_out/stl_tripped/balance_band_lower.stl",
+  "color": [
+   0.6039215980896713,
+   0.6470588972075848,
+   0.6941176948133441
+  ]
+ },
+ {
+  "name": "balance upper_clamp",
+  "file": "cad_out/stl_tripped/balance_upper_clamp.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "balance upper_post",
+  "file": "cad_out/stl_tripped/balance_upper_post.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "balance lower_clamp",
+  "file": "cad_out/stl_tripped/balance_lower_clamp.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "balance tensioner",
+  "file": "cad_out/stl_tripped/balance_tensioner.stl",
+  "color": [
+   0.4980391827468109,
+   0.5490196691901472,
+   0.5529412323287045
+  ]
+ },
+ {
+  "name": "balance tensioner_seat",
+  "file": "cad_out/stl_tripped/balance_tensioner_seat.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "balance tensioner_guide",
+  "file": "cad_out/stl_tripped/balance_tensioner_guide.stl",
+  "color": [
+   0.5411765531130832,
+   0.6078431648189146,
+   0.65882359556311
+  ]
+ },
+ {
+  "name": "balance clamp_screws",
+  "file": "cad_out/stl_tripped/balance_clamp_screws.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ }
+]

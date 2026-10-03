@@ -70,19 +70,17 @@ def mesh_phases(z_w, z_p, p_w, p_p):
     return ph_w, ph_p
 
 def rack(length, face=8.0, height=8.0, m=M, pa=PA):
-    """Rack along X, teeth pointing -Y, pitch line at y=0, body from y=0 to +height."""
+    """Rack along X, teeth pointing -Y, pitch line at y=0, body from y=0 to +height.
+    rev 4: an integer number of pitches is laid out symmetrically about x=0, so the outline is simple (the previous
+    version ran a partial last tooth past the end and produced a self-intersecting profile -> non-watertight mesh)."""
     p = math.pi*m; ha = m; hf = 1.25*m
     t = math.tan(pa)
-    pts = [(-length/2, height)]
-    x = -length/2
-    while x < length/2 - 1e-6:
-        # one pitch: root(-hf) ... tip(+ha) trapezoid, tooth centred at x + p/2
-        x0 = x; xc = x + p/2
-        pts += [(x0, -hf*0 + 0), ]  # placeholder replaced below
-        pts.pop()
+    n = int(length // p); L = n * p
+    pts = [(-L/2, height), (-L/2, hf)]
+    for i in range(n):
+        xc = -L/2 + (i + 0.5) * p
         pts += [(xc - p/4 - hf*t, hf), (xc - p/4 + ha*t, -ha), (xc + p/4 - ha*t, -ha), (xc + p/4 + hf*t, hf)]
-        x += p
-    pts += [(length/2, hf), (length/2, height)]
+    pts += [(L/2, hf), (L/2, height)]
     return cq.Workplane("XY").polyline(pts).close().extrude(face)
 
 def escape_wheel(z=dp.Z_ESCAPE, r=12.0, face=4.0):
@@ -165,7 +163,7 @@ def cradle():
     for y in RAIL_Y:
         body = body.cut(cq.Workplane("YZ").circle(3.6).extrude(x1-x0+2).translate((x0-1, y, RAIL_Z)))
     # flange holder: two lugs with a 3.6 mm slot at x = 100..103.6; also carries the rails
-    lug = cq.Workplane("XY").box(10, 36, SYR_Z+18, centered=(False, True, False)).translate((98, SYR_Y, 0))
+    lug = cq.Workplane("XY").box(8.5, 36, SYR_Z+18, centered=(False, True, False)).translate((98, SYR_Y, 0))
     for y in RAIL_Y:
         lug = lug.cut(cq.Workplane("YZ").circle(3.1).extrude(12).translate((97, y, RAIL_Z)))
     slot = cq.Workplane("XY").box(3.6, 25, 40, centered=(False, True, False)).translate((100, SYR_Y, SYR_Z-18))
@@ -173,7 +171,10 @@ def cradle():
     bore = cq.Workplane("YZ").circle(11.2).extrude(12).translate((97, SYR_Y, SYR_Z))
     lug = lug.cut(bore)
     lug = lug.cut(tape)
-    return body.union(lug)
+    body = body.union(lug)
+    # rev 4: clearance channel for the carriage rack (y 16.7..26, z 26..34), which reaches x = 85 with an empty syringe
+    body = body.cut(cq.Workplane("XY").box(x1 - x0 + 14, 12.0, 11.0, centered=(False, False, False)).translate((x0 - 1, 15.5, 25.0)))
+    return body
 
 def barrel_clamp():
     """Hinged clamp bar over the barrel (RUN position shown)."""
@@ -202,36 +203,197 @@ def carriage(xc):
     body = body.cut(cq.Workplane("YZ").circle(4.2).extrude(CAR_LEN+2).translate((xc-CAR_LEN/2-1, SYR_Y, SYR_Z)))
     lip = cq.Workplane("XY").box(6, 28, 4, centered=(False, True, False)).translate((xc-CAR_LEN/2, SYR_Y, 33.8))
     body = body.union(lip)
+    # rev 4: flag-rod and capture-pin bores through the carriage top (snap-action occlusion trip, see trip_mechanism())
+    body = body.cut(cq.Workplane("XY").circle(FLAG_ROD_R + 0.1).extrude(10).translate((xc + FLAG_DX, FLAG_Y, 58.0)))
+    body = body.cut(cq.Workplane("XY").circle(PIN_R + 0.1).extrude(10).translate((xc + CAP_DX, SYR_Y, 58.0)))
     rk = rack(110.0, face=RACK_Z[1]-RACK_Z[0], height=6.0)
     rk = rk.translate((xc, RACK_Y_PITCH, RACK_Z[0]))
     # rack body occupies y from pitch line to +8 -> attach to carriage underside (y 18..26)
     return body.union(rk)
 
-def pusher_head(xc):
-    """Pusher plate with plunger-flange gripper, mounted on the trip stem."""
-    x_face = xc - CAR_LEN/2 - 2.0
-    plate = cq.Workplane("YZ").rect(24, 32).extrude(4).translate((x_face-4, SYR_Y, SYR_Z))
-    # gripper: a C-slot that captures the thumb-press disc (BD 20 mL ~ 3 mm thick)
-    jaw = cq.Workplane("YZ").rect(24, 32).extrude(3).translate((x_face-10, SYR_Y, SYR_Z))
-    jaw = jaw.cut(cq.Workplane("YZ").rect(18, 40).extrude(3).translate((x_face-10, SYR_Y, SYR_Z-10)))
-    bridge = cq.Workplane("XY").box(6, 24, 4, centered=(False, True, False)).translate((x_face-10, SYR_Y, SYR_Z+12))
-    stem = cq.Workplane("YZ").circle(4.0).extrude(CAR_LEN+14).translate((x_face-4, SYR_Y, SYR_Z))
-    return plate.union(jaw).union(bridge).union(stem)
+# ------------------------------------------------------------------ occlusion trip (rev 4: modelled)
+# Layout (all relative to the carriage centre xc; SYR_Y = 45, SYR_Z = 55, carriage top z = 66, rear face at xc+20):
+#   stem        O8 steel, xc-26 .. xc+46; retracts +x against the trip spring when plunger reaction rises
+#   spacer      keyed ring xc+20 .. xc+20+t_s  (t_s = preload / k sets the per-syringe trip force)
+#   spring      k = 3 N/mm between spacer and end collar (xc+41 .. xc+46)
+#   trip pin    O2 pin on the end collar, SEAR_GAP = 0.15 mm behind the sear tail -> sear starts turning at 0.15 mm
+#   sear        2 mm plate on a vertical pivot (xc+22, 51); its hook lip overlaps the flag-rod collar by 0.9 mm;
+#               lever ratio hook/tail = 9/2 = 4.5 -> lip clears the collar after a further 0.20 mm of stem travel
+#               => TRIP_SENSE_TRAVEL = 0.15 + 0.9/4.5 = 0.35 mm (design_params.TRIP_SENSE_TRAVEL is derived from these)
+#   flag rod    O3 rod at (xc+13, 67), 2 N spring on the guide boss; released, it rises FLAG_TRAVEL = 6 mm
+#   rocker      see-saw on the carriage top (pivot y = 52): its long end is held down by the flag-rod lift collar;
+#               when the rod rises, a torsion spring turns the rocker and its short end drives the capture pin down
+#   capture pin O2 pin in a guide boss over the stem; drops ~3 mm into a slot in the stem top whose -x wall sits
+#               exactly TRIP_SENSE_TRAVEL behind the pin, so the captured stem cannot spring forward (release bolus 0)
+#   trip rail   frame-mounted bar (y = 72, z = 100) hinged at x = 250, resting on the flag head along the travel
+#   drop rod    O3 rod at x = 96 pinned to the rail, through the deck; lifts a telescoping sleeve + under-deck arm
+#               carrying a two-pin fork that rises around a balance spoke (lost motion: sleeve stops at the deck after 7 mm)
+STEM_R = 4.0; STEM_X0, STEM_X1 = -26.0, 46.0
+SPACER_R = 7.5; SPRING_R_O, SPRING_R_I = 6.0, 4.8
+COLLAR_X0, COLLAR_X1, COLLAR_R = 41.0, 46.0, 6.0
+SEAR_GAP = 0.15; SEAR_OVERLAP = 0.9
+SEAR_PIVOT = (22.0, 51.0); SEAR_Z = (84.0, 86.0)
+HOOK_TIP = (13.0, 62.0)               # hook lip centre (x rel xc, y)
+TRIP_PIN_Y = 49.0                      # tail contact y -> tail lever dy = 2 mm
+SEAR_RATIO = abs(HOOK_TIP[0] - SEAR_PIVOT[0]) / abs(SEAR_PIVOT[1] - TRIP_PIN_Y)   # lip y-motion per tail x-motion = 4.5
+SENSE_TRAVEL = SEAR_GAP + SEAR_OVERLAP / SEAR_RATIO                               # 0.35 mm
+FLAG_DX, FLAG_Y, FLAG_ROD_R = 13.0, 67.0, 1.5
+FLAG_TRAVEL = 6.0
+PIN_R = 1.0
+CAP_DX = 6.0                           # capture pin x (rel xc) over the stem axis
+ROCKER_PIVOT_Y, ROCKER_Z = 52.0, (73.5, 76.0)
+ROCKER_BASE_TOP = 70.5                 # boss base top: 3 mm under the bar so the bar can tilt ~25 deg
+RAIL_Y_TRIP, RAIL_ZB, RAIL_H = 72.0, 100.0, 4.0
+CRANK_POSTS, CRANK_L = (70.0, 238.0), 20.0   # parallel-motion cranks: the rail translates (rises FLAG_TRAVEL everywhere)
+RAIL_X0, RAIL_X1 = CRANK_POSTS[0] + CRANK_L - 2.0, CRANK_POSTS[1] + CRANK_L + 1.5
+DROP_X = 96.0
+STOP_R, STOP_ANGLES = 18.0, (80.0, 100.0)   # fork pins straddle the 90-degree spoke: +/-4.8 deg free play < 6 deg unlock
 
-def trip_spring(xc):
-    """Calibrated occlusion-trip compression spring behind the stem (helix as swept circle)."""
-    x0 = xc + CAR_LEN/2 + 1
-    # coil represented as a stack of 6 rings (render-friendly stand-in for the helix)
+def _stack_rings(x0, x1, ro, ri, axis="x", yz=(0, 0), n=None):
+    L = x1 - x0; n = n or max(2, int(L / 1.6))
+    pitch = (L - 0.9) / max(1, n - 1)
     sp = None
-    for i in range(6):
-        ring = cq.Workplane("YZ").circle(6.0).circle(4.8).extrude(0.9).translate((x0 + i*1.6, SYR_Y, SYR_Z))
+    for i in range(n):
+        if axis == "x":
+            ring = cq.Workplane("YZ").circle(ro).circle(ri).extrude(0.9).translate((x0 + i*pitch, yz[0], yz[1]))
+        else:
+            ring = cq.Workplane("XY").circle(ro).circle(ri).extrude(0.9).translate((yz[0], yz[1], x0 + i*pitch))
         sp = ring if sp is None else sp.union(ring)
     return sp
 
-def trip_knob_and_flag(xc):
-    knob = cq.Workplane("YZ").polygon(6, 14).extrude(6).translate((xc + CAR_LEN/2 + 11, SYR_Y, SYR_Z))
-    flag = cq.Workplane("XY").box(3, 8, 10, centered=(True, True, False)).translate((xc + CAR_LEN/2 - 6, SYR_Y, 66))
-    return knob, flag
+def trip_mechanism(xc, tripped=False, syringe="BD 20 mL", stem_advance=0.0):
+    """Snap-action occlusion trip on the carriage.  tripped=True poses the mechanism just after release:
+    stem retracted by SENSE_TRAVEL, sear turned, flag rod up by FLAG_TRAVEL, rocker turned, capture pin in the stem slot."""
+    d = (SENSE_TRAVEL if tripped else 0.0) - stem_advance           # stem_advance: forward creep of the stem after capture (test)
+    t_s = dp.trip_preload(syringe) / dp.TRIP_SPRING_RATE            # spacer thickness (mm)
+    x_face = xc - CAR_LEN/2 - 2.0
+    # pusher plate + flange gripper on the stem front
+    plate = cq.Workplane("YZ").rect(24, 32).extrude(4).translate((x_face-4+d, SYR_Y, SYR_Z))
+    jaw = cq.Workplane("YZ").rect(24, 32).extrude(3).translate((x_face-10+d, SYR_Y, SYR_Z))
+    jaw = jaw.cut(cq.Workplane("YZ").rect(18, 40).extrude(3).translate((x_face-10+d, SYR_Y, SYR_Z-10)))
+    bridge = cq.Workplane("XY").box(6, 24, 4, centered=(False, True, False)).translate((x_face-10+d, SYR_Y, SYR_Z+12))
+    stem = cq.Workplane("YZ").circle(STEM_R).extrude(STEM_X1 - STEM_X0).translate((xc + STEM_X0 + d, SYR_Y, SYR_Z))
+    # capture slot in the stem top (armed frame, slot moves +x with the stem): the +x wall sits SENSE_TRAVEL short of the
+    # pin's +x face, so after the 0.35 mm retraction it is flush with the pin and the stem cannot move back toward the
+    # syringe (the pin rests on the solid stem top until then); 0.6 mm clearance on the -x side in the tripped pose
+    slot_x0 = xc + CAP_DX - PIN_R - 0.6 - SENSE_TRAVEL; slot_x1 = xc + CAP_DX + PIN_R - SENSE_TRAVEL
+    stem = stem.cut(cq.Workplane("XY").box(slot_x1 - slot_x0, 3.0, 4.0, centered=(False, True, False))
+                    .translate((slot_x0 + d, SYR_Y, SYR_Z + STEM_R - 2.5)))
+    # end collar + trip pin; spring; keyed spacer
+    collar = cq.Workplane("YZ").circle(COLLAR_R).extrude(COLLAR_X1 - COLLAR_X0).translate((xc + COLLAR_X0 + d, SYR_Y, SYR_Z))
+    tail_x1 = xc + COLLAR_X0 + 2.5            # sear tail +x face
+    trip_pin = cq.Workplane("XY").circle(PIN_R).extrude(SEAR_Z[1] + 0.5 - (SYR_Z + 3.0)).translate(
+        (tail_x1 + SEAR_GAP + PIN_R + d, TRIP_PIN_Y, SYR_Z + 3.0))
+    pusher = plate.union(jaw).union(bridge).union(stem).union(collar).union(trip_pin)
+    spacer = cq.Workplane("YZ").circle(SPACER_R).circle(STEM_R + 0.1).extrude(t_s).translate((xc + CAR_LEN/2, SYR_Y, SYR_Z))
+    key = cq.Workplane("XY").box(t_s, 3.0, 4.0, centered=(False, True, False)).translate((xc + CAR_LEN/2, SYR_Y, SYR_Z - SPACER_R - 3.5))
+    spacer = spacer.union(key)                # key tab engages a keyway in the cradle insert (one spacer per syringe size)
+    spring = _stack_rings(xc + CAR_LEN/2 + t_s + 0.3, xc + COLLAR_X0 + d - 0.3, SPRING_R_O, SPRING_R_I, yz=(SYR_Y, SYR_Z))
+    # ---- sear (2 mm plate on a vertical pivot pin, resting on a boss on the carriage top)
+    px, py = xc + SEAR_PIVOT[0], SEAR_PIVOT[1]
+    hub = cq.Workplane("XY").circle(3.0).extrude(SEAR_Z[1] - SEAR_Z[0]).translate((px, py, SEAR_Z[0]))
+    hx, hy = xc + HOOK_TIP[0], HOOK_TIP[1]
+    L_hook = math.hypot(hx - px, hy - py); a_hook = math.degrees(math.atan2(hy - py, hx - px))
+    hook_arm = (cq.Workplane("XY").box(L_hook, 3.0, SEAR_Z[1] - SEAR_Z[0], centered=(False, True, False))
+                .rotate((0, 0, 0), (0, 0, 1), a_hook).translate((px, py, SEAR_Z[0])))
+    # hook lip: pad whose +y edge overlaps the collar (collar -y edge at FLAG_Y-3) by SEAR_OVERLAP
+    lip = cq.Workplane("XY").box(3.0, 2.4, SEAR_Z[1] - SEAR_Z[0], centered=(True, False, False)).translate(
+        (hx, FLAG_Y - 3.0 + SEAR_OVERLAP - 2.4, SEAR_Z[0]))
+    tail = cq.Workplane("XY").box(tail_x1 - px, 3.0, SEAR_Z[1] - SEAR_Z[0], centered=(False, True, False)).translate(
+        (px, TRIP_PIN_Y, SEAR_Z[0]))
+    sear = hub.union(hook_arm).union(lip).union(tail)
+    sear = sear.cut(cq.Workplane("XY").circle(0.8).extrude(5).translate((px, py, SEAR_Z[0] - 1)))
+    if tripped:
+        psi = math.degrees((SENSE_TRAVEL - SEAR_GAP) / (py - TRIP_PIN_Y))   # tail pushed +x by (travel - gap); tail lever = py - TRIP_PIN_Y
+        sear = sear.rotate((px, py, 0), (px, py, 1), psi)
+    sear_pin = cq.Workplane("XY").circle(0.75).extrude(SEAR_Z[1] + 1 - 66.0).translate((px, py, 66.0))
+    sear_boss = cq.Workplane("XY").box(6, 6, SEAR_Z[0] - 66.0, centered=(True, True, False)).translate((px, py, 66.0))
+    sear_boss = sear_boss.cut(cq.Workplane("XY").circle(0.75).extrude(30).translate((px, py, 66.0)))
+    sear_spring = cq.Workplane("XY").circle(2.2).circle(1.6).extrude(1.5).translate((px, py, SEAR_Z[1]))   # torsion-spring stand-in
+    # ---- flag rod: guide boss on the carriage top, spring, lift collar (rocker), hook collar (sear), head
+    dz = FLAG_TRAVEL if tripped else 0.0
+    fx = xc + FLAG_DX
+    rod = cq.Workplane("XY").circle(FLAG_ROD_R).extrude(100.0 - 60.0).translate((fx, FLAG_Y, 60.0 + dz))
+    lift_collar = cq.Workplane("XY").circle(3.5).extrude(2.0).translate((fx, FLAG_Y, ROCKER_Z[1] + dz))          # 76..78
+    hook_collar = cq.Workplane("XY").circle(3.0).extrude(2.0).translate((fx, FLAG_Y, SEAR_Z[0] - 2.0 + dz))      # 80..82
+    head = cq.Workplane("XY").box(10, 16, 4, centered=(True, True, False)).translate((fx, FLAG_Y, 96.0 + dz))
+    flag_rod = rod.union(lift_collar).union(hook_collar).union(head)
+    boss = cq.Workplane("XY").circle(4.0).circle(FLAG_ROD_R + 0.1).extrude(4.0).translate((fx, FLAG_Y, 66.0))
+    flag_spring = _stack_rings(70.3, ROCKER_Z[1] + dz - 0.3, 2.8, 2.0, axis="z", yz=(fx, FLAG_Y), n=3)
+    # ---- rocker (bar in the YZ plane at x = xc+CAP_DX): long end under the lift collar, short end under the capture-pin head
+    rx = xc + CAP_DX
+    y0, y1 = SYR_Y - 2.0, FLAG_Y - 2.0
+    bar = cq.Workplane("XY").box(4.4, y1 - y0, ROCKER_Z[1] - ROCKER_Z[0], centered=(True, False, False)).translate((rx, y0, ROCKER_Z[0]))
+    zp = (ROCKER_Z[0] + ROCKER_Z[1]) / 2
+    bar = bar.cut(cq.Workplane("YZ").circle(0.8).extrude(6).translate((rx - 3, ROCKER_PIVOT_Y, zp)))
+    bar = bar.cut(cq.Workplane("XY").box(2*PIN_R + 0.4, SYR_Y + 2.6 - (y0 - 1), 6, centered=(True, False, False))
+                  .translate((rx, y0 - 1, ROCKER_Z[0] - 1)))     # fork around the capture-pin shaft (bar end sits under its head)
+    cap_len = ROCKER_PIVOT_Y - SYR_Y; lift_len = FLAG_Y - ROCKER_PIVOT_Y
+    phi = math.degrees(math.atan2(dz, lift_len)) if tripped else 0.0
+    # pin head rests on the highest point of the tilted bar under it (bar edge at y = SYR_Y + 2): ~2.2 mm travel for a 6 mm rod rise
+    cap_drop = ROCKER_Z[1] - (zp + (SYR_Y + 2.0 - ROCKER_PIVOT_Y) * math.sin(math.radians(phi)) + (ROCKER_Z[1] - zp) * math.cos(math.radians(phi)))
+    if tripped:
+        bar = bar.rotate((rx - 5, ROCKER_PIVOT_Y, zp), (rx + 5, ROCKER_PIVOT_Y, zp), phi)   # +phi lifts the +y (collar) end
+    rocker_boss = cq.Workplane("XY").box(8, 6, ROCKER_BASE_TOP - 66.0, centered=(True, True, False)).translate((rx, ROCKER_PIVOT_Y, 66.0))
+    for sx in (-2.95, 2.95):   # cheeks carrying the pivot pin
+        rocker_boss = rocker_boss.union(cq.Workplane("XY").box(1.5, 6, ROCKER_Z[1] + 1.0 - ROCKER_BASE_TOP, centered=(True, True, False))
+                                        .translate((rx + sx, ROCKER_PIVOT_Y, ROCKER_BASE_TOP)))
+    rocker_boss = rocker_boss.cut(cq.Workplane("YZ").circle(0.8).extrude(8).translate((rx - 4, ROCKER_PIVOT_Y, zp)))
+    rocker_pin = cq.Workplane("YZ").circle(0.75).extrude(8).translate((rx - 4, ROCKER_PIVOT_Y, zp))
+    rocker_spring = cq.Workplane("YZ").circle(2.4).circle(1.7).extrude(1.5).translate((rx + 3.9, ROCKER_PIVOT_Y, zp))  # torsion-spring stand-in
+    # ---- capture pin in its guide boss (tip 1 mm above the stem top when armed)
+    cap_tip = SYR_Z + STEM_R + 0.5 - cap_drop                        # 0.5 mm above the stem top when armed
+    cap_pin = cq.Workplane("XY").circle(PIN_R).extrude(ROCKER_Z[1] - cap_tip).translate((rx, SYR_Y, cap_tip))
+    cap_pin = cap_pin.union(cq.Workplane("XY").circle(2.0).extrude(2.0).translate((rx, SYR_Y, ROCKER_Z[1] - cap_drop)))  # head
+    cap_boss = cq.Workplane("XY").circle(3.0).circle(PIN_R + 0.1).extrude(ROCKER_BASE_TOP - 0.5 - 66.0).translate((rx, SYR_Y, 66.0))
+    return dict(pusher=pusher, spacer=spacer, trip_spring=spring, sear=sear, sear_pin=sear_pin, sear_boss=sear_boss,
+                sear_spring=sear_spring, flag_rod=flag_rod, flag_boss=boss, flag_spring=flag_spring,
+                rocker=bar, rocker_boss=rocker_boss, rocker_pin=rocker_pin, rocker_spring=rocker_spring,
+                capture_pin=cap_pin, capture_boss=cap_boss), t_s
+
+def trip_rail_linkage(xc, tripped=False):
+    """Frame-mounted trip rail on two parallel-motion cranks + drop rod + under-deck arm with a two-pin fork that rises
+    around a balance spoke.  The rail is a parallelogram coupler, so it rises by FLAG_TRAVEL wherever the flag lifts it."""
+    bx, by = BAL_XY
+    zp = RAIL_ZB + RAIL_H/2
+    alpha = math.degrees(math.asin(FLAG_TRAVEL / CRANK_L)) if tripped else 0.0
+    dx = CRANK_L * (math.cos(math.radians(alpha)) - 1.0); dz = FLAG_TRAVEL if tripped else 0.0
+    posts = None; cranks = None; pins = None
+    for xp in CRANK_POSTS:
+        post = cq.Workplane("XY").box(6, 8, RAIL_ZB - 6.0, centered=(True, True, False)).translate((xp, RAIL_Y_TRIP, 0))
+        cheek = cq.Workplane("XY").box(6, 2, 10, centered=(True, True, False)).translate((xp, RAIL_Y_TRIP - 6, RAIL_ZB - 6.0))
+        cheek = cheek.cut(cq.Workplane("XZ").circle(1.1).extrude(4).translate((xp, RAIL_Y_TRIP - 4, zp)))
+        post = post.union(cheek)
+        posts = post if posts is None else posts.union(post)
+        crank = cq.Workplane("XY").box(CRANK_L + 6, 2, 4, centered=(False, True, False)).translate((xp - 3, RAIL_Y_TRIP - 4, zp - 2))
+        crank = crank.cut(cq.Workplane("XZ").circle(1.1).extrude(4).translate((xp, RAIL_Y_TRIP - 2, zp)))
+        crank = crank.cut(cq.Workplane("XZ").circle(1.1).extrude(4).translate((xp + CRANK_L, RAIL_Y_TRIP - 2, zp)))
+        if tripped: crank = crank.rotate((xp, 0, zp), (xp, 1, zp), alpha)
+        cranks = crank if cranks is None else cranks.union(crank)
+        p1 = cq.Workplane("XZ").circle(1.0).extrude(4.5).translate((xp, RAIL_Y_TRIP - 3.0, zp))                      # post pivot (cheek + crank)
+        p2 = cq.Workplane("XZ").circle(1.0).extrude(9).translate((xp + CRANK_L + dx, RAIL_Y_TRIP + 3.5, zp + dz))    # rail pivot (crank + rail)
+        pins = p1.union(p2) if pins is None else pins.union(p1).union(p2)
+    rail = cq.Workplane("XY").box(RAIL_X1 - RAIL_X0, 6, RAIL_H, centered=(False, True, False)).translate((RAIL_X0, RAIL_Y_TRIP, RAIL_ZB))
+    for xp in CRANK_POSTS:
+        rail = rail.cut(cq.Workplane("XZ").circle(1.1).extrude(12).translate((xp + CRANK_L, RAIL_Y_TRIP + 6, zp)))
+    rail = rail.cut(cq.Workplane("XY").circle(FLAG_ROD_R + 0.1).extrude(RAIL_H + 2).translate((DROP_X, RAIL_Y_TRIP, RAIL_ZB - 1)))   # drop rod seat
+    rail = rail.translate((dx, 0, dz))
+    # drop rod fixed to the rail, through the deck, carrying the under-deck arm and the stop fork
+    y_fork = by + STOP_R * math.sin(math.radians(STOP_ANGLES[0]))
+    z_arm = -50.0
+    rod = cq.Workplane("XY").circle(FLAG_ROD_R).extrude(RAIL_ZB + RAIL_H - z_arm).translate((DROP_X, RAIL_Y_TRIP, z_arm))
+    arm_y = cq.Workplane("XY").box(4, RAIL_Y_TRIP - y_fork + 4, 4, centered=(True, False, False)).translate((DROP_X, y_fork - 2, z_arm))
+    xs = [bx + STOP_R * math.cos(math.radians(a)) for a in STOP_ANGLES]
+    arm_x = cq.Workplane("XY").box(DROP_X + 2 - (min(xs) - 2), 4, 4, centered=(False, True, False)).translate((min(xs) - 2, y_fork, z_arm))
+    link = rod.union(arm_y).union(arm_x)
+    dx_trip = CRANK_L * (math.cos(math.asin(FLAG_TRAVEL / CRANK_L)) - 1.0)   # parallelogram side-shift when tripped (-0.93 mm)
+    for a in STOP_ANGLES:   # fork pins: tips at z = -41 armed (3.75 mm under the spoke), -35 tripped (inside the 2.5 mm spoke);
+        # placed so that they are symmetric about the spoke in the TRIPPED pose (pre-offset by -dx_trip)
+        p = cq.Workplane("XY").circle(PIN_R).extrude(-41.0 - (z_arm + 4)).translate(
+            (bx + STOP_R * math.cos(math.radians(a)) - dx_trip, by + STOP_R * math.sin(math.radians(a)), z_arm + 4))
+        link = link.union(p)
+    link = link.translate((dx, 0, dz))
+    return dict(trip_rail=rail, rail_posts=posts, rail_cranks=cranks, rail_pins=pins, stop_linkage=link)
 
 def spring_drum():
     cx, cz = 18.0, 21.0
@@ -261,9 +423,9 @@ def syringe(fill_fraction=1.0):
     nozzle = cq.Workplane("YZ").circle(2.2).extrude(10).translate((x_fl-101, SYR_Y, SYR_Z))
     flange = cq.Workplane("YZ").rect(24, 33).extrude(3).translate((x_fl, SYR_Y, SYR_Z))
     flange = flange.cut(cq.Workplane("YZ").circle(ID/2).extrude(5).translate((x_fl-1, SYR_Y, SYR_Z)))
-    fluid_len = dp.SYR_STROKE * fill_fraction          # full syringe: stopper near the flange end
+    fluid_len = (dp.SYR_VOL_ML * 1000.0 / dp.SYRINGES["BD 20 mL"]["area_mm2"]) * fill_fraction   # 69.6 mm stroke of the BD 20 mL (rev 4; was the 95 mm carriage travel)
     stopper_x = x_fl - 88 + 3 + fluid_len               # front face of the rubber stopper
-    rod_len = 82.0                                      # empty syringe -> thumb press ~5 mm behind the flange
+    rod_len = 86.0                                      # empty syringe -> thumb press 6 mm behind the flange (clears the 6.5 mm flange lug)
     stopper = cq.Workplane("YZ").circle(ID/2 - 0.1).extrude(8).translate((stopper_x, SYR_Y, SYR_Z))
     rod = cq.Workplane("YZ").rect(9, 9).extrude(rod_len).translate((stopper_x + 8, SYR_Y, SYR_Z))
     thumb_x = stopper_x + 8 + rod_len
@@ -279,21 +441,42 @@ def shafts():
         sh[k] = cq.Workplane("XY").circle(SHAFT_D/2).extrude(z1-z0).translate((x, y, z0))
     return sh
 
-def gear_train(cassette):
+XC_REF = 213.0 - math.pi/2 - 17*math.pi      # carriage x at which a rack tooth is centred under the pinion (= 158.02)
+
+def train_angles(cassette, xc):
+    """Rotation (deg) of every gear for carriage position xc, consistent through all seven meshes; the carriage
+    displacement is trimmed by < 0.03 mm so that the escape wheel sits at a locked tooth (multiple of 24 deg)."""
+    z1, z2, z3, z4 = dp.CASSETTES[cassette]
+    r_p0 = M * dp.Z_RACK_PINION / 2
+    ratios = [1.0, -60/12, -60/12, -60/12, -30/12, -z1/z2, -z3/z4]       # P0/W1, P1/W2, P2/W3, P3/W4, P4/g1, g2/g3, g4/esc
+    K = -1.0 / r_p0                                                    # rad of P0 per mm of carriage (+x rack -> cw)
+    for r in ratios[1:]: K *= r
+    dx = xc - XC_REF
+    esc = math.degrees(K * dx); esc_snap = round(esc / 24.0) * 24.0
+    dx = dx + (math.radians(esc_snap) - math.radians(esc)) / K if K else dx
+    th = -dx / r_p0; out = []
+    for r in ratios:
+        th = th * r if r != 1.0 else th
+        out.append(math.degrees(th))
+    return dict(P0=out[0], W1=out[0], P1=out[1], W2=out[1], P2=out[2], W3=out[2], P3=out[3], W4=out[3],
+                P4=out[4], g1=out[4], g2=out[5], g3=out[5], g4=out[6], esc=out[6])
+
+def gear_train(cassette, xc=None):
     z1, z2, z3, z4 = dp.CASSETTES[cassette]
     G = {}
     f8 = dp.GEAR_FACE_STAGE1; f4 = dp.GEAR_FACE
-    # rack pinion: rack tooth centred at x = S1.x (rack built centred on xc; phase so a pinion gap faces -Y... use 15 deg)
-    G["P0 rack pinion"] = at(involute_gear(dp.Z_RACK_PINION, face=f8, phase_deg=(90 + 180/12) % 30), *S["S1"], RACK_Z[0])
-    pairs = [("W1 60T", 60, "S1", "P1 12T", 12, "S2", f8, LV["L1"]), ("W2 60T", 60, "S2", "P2 12T", 12, "S3", f4, LV["L2"]),
-             ("W3 60T", 60, "S3", "P3 12T", 12, "S4", f4, LV["L3"]), ("W4 30T", 30, "S4", "P4 12T", 12, "S5", f4, LV["L4"]),
-             (f"cassette g1 {z1}T", z1, "S5", f"cassette g2 {z2}T", z2, "S6", f4, LV["L5"]),
-             (f"cassette g3 {z3}T", z3, "S6", f"cassette g4 {z4}T", z4, "S7", f4, LV["L6"])]
-    for nw, zw, sw, npn, zp, sp, f, lv in pairs:
+    ang = train_angles(cassette, xc) if xc is not None else {k: 0.0 for k in "P0 W1 P1 W2 P2 W3 P3 W4 P4 g1 g2 g3 g4 esc".split()}
+    # rack pinion: at XC_REF a rack tooth is centred under the pinion and a pinion gap faces +Y (the rack)
+    G["P0 rack pinion"] = at(involute_gear(dp.Z_RACK_PINION, face=f8, phase_deg=(90 + 180/12) % 30 + ang["P0"]), *S["S1"], RACK_Z[0])
+    pairs = [("W1 60T", 60, "S1", "P1 12T", 12, "S2", f8, LV["L1"], "W1", "P1"), ("W2 60T", 60, "S2", "P2 12T", 12, "S3", f4, LV["L2"], "W2", "P2"),
+             ("W3 60T", 60, "S3", "P3 12T", 12, "S4", f4, LV["L3"], "W3", "P3"), ("W4 30T", 30, "S4", "P4 12T", 12, "S5", f4, LV["L4"], "W4", "P4"),
+             (f"cassette g1 {z1}T", z1, "S5", f"cassette g2 {z2}T", z2, "S6", f4, LV["L5"], "g1", "g2"),
+             (f"cassette g3 {z3}T", z3, "S6", f"cassette g4 {z4}T", z4, "S7", f4, LV["L6"], "g3", "g4")]
+    for nw, zw, sw, npn, zp, sp, f, lv, kw, kp in pairs:
         phw, php = mesh_phases(zw, zp, S[sw], S[sp])
-        G[nw] = at(involute_gear(zw, face=f, phase_deg=phw), *S[sw], lv - f/2)
-        G[npn] = at(involute_gear(zp, face=f, phase_deg=php), *S[sp], lv - f/2)
-    G["escape wheel 15T"] = at(escape_wheel(face=f4), *S["S7"], LV["L7"]-f4/2)
+        G[nw] = at(involute_gear(zw, face=f, phase_deg=phw + ang[kw]), *S[sw], lv - f/2)
+        G[npn] = at(involute_gear(zp, face=f, phase_deg=php + ang[kp]), *S[sp], lv - f/2)
+    G["escape wheel 15T"] = at(escape_wheel(face=f4).rotate((0, 0, 0), (0, 0, 1), ang["esc"] % 24.0), *S["S7"], LV["L7"]-f4/2)
     return G
 
 def ratchet_click():
@@ -347,6 +530,26 @@ def spring_arm_escapement():
     # latch block between the arms, released by the balance impulse pin
     lx, ly = ex + 30*ux, ey + 30*uy
     parts["latch"] = cq.Workplane("XY").box(4, 10, 5.5, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(uy, ux))).translate((lx, ly, LV["L7"] - 8.5))
+    # rev 4: compliant wheel DETENT on the far side of the wheel.  The wheel is locked by this detent (not by the arm)
+    # during impulse and released by the arm at the end of its stroke; its 0.8 x 4 x 8 mm PETG flexure (k ~ 2000 N/m)
+    # limits the lock impact to < 0.7 N / 19 MPa at 476 uN m (analysis_arm_mechanism.py).  Representative embodiment.
+    zd = LV["L7"] - 2.5 - 0.5
+    ang_back = math.atan2(-uy, -ux); pitch = 2*math.pi/dp.Z_ESCAPE
+    a_pin = round(ang_back / pitch) * pitch + 0.21                    # in the gap behind a tooth root
+    r_pin = 10.3
+    pxd, pyd = ex + r_pin*math.cos(a_pin), ey + r_pin*math.sin(a_pin)
+    dvx, dvy = -ux, -uy; dnx, dny = -uy, ux                           # detent axis points away from the balance
+    hub_x, hub_y = ex + 20*dvx, ey + 20*dvy                           # detent pivot post
+    lever = cq.Workplane("XY").polyline([(hub_x + 2*dnx, hub_y + 2*dny), (hub_x - 2*dnx, hub_y - 2*dny),
+                                         (pxd - 1.2*dnx, pyd - 1.2*dny), (pxd + 1.2*dnx, pyd + 1.2*dny)]).close().extrude(2.5).translate((0, 0, zd))
+    lever = lever.union(cq.Workplane("XY").circle(2.5).extrude(2.5).translate((hub_x, hub_y, zd)))
+    lever = lever.cut(cq.Workplane("XY").circle(1.05).extrude(4).translate((hub_x, hub_y, zd - 0.5)))
+    parts["wheel detent"] = lever
+    parts["wheel detent pin"] = cq.Workplane("XY").circle(0.5).extrude(LV["L7"] + 2.0 - (zd - 0.5)).translate((pxd, pyd, zd - 0.5))
+    parts["wheel detent pivot pin"] = cq.Workplane("XY").circle(1.0).extrude(10).translate((hub_x, hub_y, zd - 6))
+    fx_, fy_ = hub_x + 6*dnx + 4*dvx, hub_y + 6*dny + 4*dvy          # flexure beside the lever, anchored on a post
+    parts["wheel detent flexure"] = cq.Workplane("XY").box(8, 0.8, 4, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(dvy, dvx))).translate((fx_, fy_, zd - 0.5))
+    parts["wheel detent post"] = cq.Workplane("XY").circle(2).extrude(12).translate((fx_ + 4*dvx, fy_ + 4*dvy, zd - 8))
     return parts
 
 def balance_assembly():
@@ -379,30 +582,63 @@ def balance_assembly():
     Lh = dp.BAND_LH*1e3
     band_up = cq.Workplane("XY").box(dp.BAND_W*1e3, dp.BAND_T*1e3, Lh + th/2 + 2, centered=(True, True, False)).translate((bx, by, zc))
     band_dn = cq.Workplane("XY").box(dp.BAND_W*1e3, dp.BAND_T*1e3, Lh + th/2 + 2, centered=(True, True, False)).translate((bx, by, zc - Lh - th/2 - 2))
-    upper_clamp = cq.Workplane("XY").box(10, 8, 6, centered=(True, True, False)).translate((bx, by, zc + th/2 + Lh - 4)) # boss on deck underside
-    # upper clamp must reach the deck underside at z=-6: extend
-    upper_post = cq.Workplane("XY").box(10, 8, DECK_Z[0] - (zc + th/2 + Lh), centered=(True, True, False)).translate((bx, by, zc + th/2 + Lh))
-    lower_clamp = cq.Workplane("XY").box(10, 8, 4, centered=(True, True, False)).translate((bx, by, zc - th/2 - Lh - 4))
-    # tensioner: steel coil spring between lower clamp and bottom plate
-    zt0 = BOTTOM_Z[1]; zt1 = zc - th/2 - Lh - 4
+    # rev 4: both band clamps adjustable (symmetric free-length trim L_h 18..26.5 mm, design_params.BAND_LH_MIN/MAX)
+    z_uc = zc + th/2 + Lh - 4                       # upper clamp block bottom
+    upper_clamp = cq.Workplane("XY").box(10, 8, 6, centered=(True, True, False)).translate((bx, by, z_uc))
+    upper_clamp = upper_clamp.cut(cq.Workplane("XY").box(dp.BAND_W*1e3+0.2, dp.BAND_T*1e3+0.2, 7).translate((bx, by, z_uc + 3)))
+    Lh_min, Lh_max = dp.BAND_LH_MIN*1e3, dp.BAND_LH_MAX*1e3
+    # slotted hanger plate from the deck underside (3 mm steel), two M3 slots for the clamp screws
+    upper_post = cq.Workplane("XY").box(12, 3, DECK_Z[1] - (zc + th/2 + Lh_min - 6), centered=(True, False, False)).translate((bx, by + 4, zc + th/2 + Lh_min - 6))
+    upper_post = upper_post.union(cq.Workplane("XY").box(16, 8, 3, centered=(True, False, False)).translate((bx, by + 4, DECK_Z[1])))  # flange on the deck top
+    for sx in (-3.0, 3.0):
+        slot = cq.Workplane("XZ").slot2D(Lh_max - Lh_min + 3.2, 3.2, 90).extrude(-5).translate((bx + sx, by + 3.5, zc + th/2 + (Lh_min + Lh_max)/2 - 1))
+        upper_post = upper_post.cut(slot)
+    screws = None
+    for sx in (-3.0, 3.0):
+        s = cq.Workplane("XZ").circle(1.5).extrude(-9).translate((bx + sx, by - 1, z_uc + 3))          # M3 x 10 (along +y)
+        s = s.union(cq.Workplane("XZ").circle(2.7).extrude(-2).translate((bx + sx, by + 7, z_uc + 3)))  # head
+        screws = s if screws is None else screws.union(s)
+    z_lc = zc - th/2 - Lh - 4                       # lower clamp block bottom (floats on the tensioner spring)
+    lower_clamp = cq.Workplane("XY").box(10, 8, 4, centered=(True, True, False)).translate((bx, by, z_lc))
+    lower_clamp = lower_clamp.cut(cq.Workplane("XY").box(dp.BAND_W*1e3+0.2, dp.BAND_T*1e3+0.2, 5).translate((bx, by, z_lc + 2)))
+    # tensioner: steel coil spring between the lower clamp and a spring-seat block clamped on a slotted bracket
+    SPRING_LEN = 6.5
+    z_seat = z_lc - SPRING_LEN                      # seat block top
+    seat = cq.Workplane("XY").box(10, 8, 3, centered=(True, True, False)).translate((bx, by, z_seat - 3))
     tens = None
-    n = max(2, int((zt1 - zt0 - 3.2) / 1.6))
-    for i in range(n):
-        ring = cq.Workplane("XY").circle(3.4).circle(2.6).extrude(0.8).translate((bx, by, zt0 + 3.2 + i*1.6))
+    for i in range(4):
+        ring = cq.Workplane("XY").circle(3.4).circle(2.6).extrude(0.8).translate((bx, by, z_seat + 0.2 + i*1.55))
         tens = ring if tens is None else tens.union(ring)
-    guide = cq.Workplane("XY").box(14, 12, 3, centered=(True, True, False)).translate((bx, by, zt0))
+    z_b0 = BOTTOM_Z[0]; z_b1 = zc - th/2 - Lh_min - 4 + 8
+    bracket = cq.Workplane("XY").box(12, 3, z_b1 - z_b0, centered=(True, False, False)).translate((bx, by + 4, z_b0))
+    for sx in (-3.0, 3.0):   # slot covers seat screws (z_lc-8) and lower-clamp guide pins (z_lc+2) over L_h 18..26.5 mm
+        slot = cq.Workplane("XZ").slot2D(22.0, 3.2, 90).extrude(-5).translate((bx + sx, by + 3.5, zc - th/2 - 4 - (Lh_min + Lh_max)/2 - 3.0))
+        bracket = bracket.cut(slot)
+    for sx in (-14.0, 14.0):   # feet on the bottom plate either side of the clearance pocket
+        bracket = bracket.union(cq.Workplane("XY").box(4, 12, 3, centered=(True, True, False)).translate((bx + sx, by, BOTTOM_Z[1])))
+    bracket = bracket.union(cq.Workplane("XY").box(32, 3, 3, centered=(True, False, False)).translate((bx, by + 4, BOTTOM_Z[1])))
+    for sx in (-3.0, 3.0):
+        s = cq.Workplane("XZ").circle(1.5).extrude(-9).translate((bx + sx, by - 1, z_seat - 1.5))     # seat screws
+        s = s.union(cq.Workplane("XZ").circle(2.7).extrude(-2).translate((bx + sx, by + 7, z_seat - 1.5)))
+        g = cq.Workplane("XZ").circle(1.5).extrude(-8).translate((bx + sx, by - 1, z_lc + 2))          # lower-clamp guide pins (slide in slots)
+        screws = screws.union(s).union(g)
+    guide = bracket
     return dict(balance=balance, trims=trims, impulse_pin=pin, band_upper=band_up, band_lower=band_dn,
-                upper_clamp=upper_clamp.union(upper_post), lower_clamp=lower_clamp, tensioner=tens, tensioner_guide=guide)
+                upper_clamp=upper_clamp, upper_post=upper_post, lower_clamp=lower_clamp, tensioner=tens,
+                tensioner_seat=seat, tensioner_guide=guide, clamp_screws=screws)
 
 # ------------------------------------------------------------------ assembly
-def build(cassette="10 mL/h", fill=0.85, exploded=0.0):
+def build(cassette="10 mL/h", fill=0.85, exploded=0.0, tripped=False, balance_angle=0.0, xc_override=None, stem_advance=0.0):
     asm = cq.Assembly(name="ChronoFlow")
     def add(obj, name, color, dz=0.0):
         if obj is None: return
         if exploded: obj = obj.translate((0, 0, dz*exploded))
         asm.add(obj, name=name, color=cq.Color(color))
-    add(deck_plate(), "deck plate", COL["frame"], 0)
-    add(bottom_plate(), "bottom plate", COL["frame"], -40)
+    bp = bottom_plate().cut(cq.Workplane("XY").box(18, 16, 10).translate((BAL_XY[0], BAL_XY[1] + 2, BOTTOM_Z[0] + 3)))  # tensioner pocket
+    add(bp, "bottom plate", COL["frame"], -40)
+    deck = deck_plate().cut(cq.Workplane("XY").slot2D(2*FLAG_ROD_R + 3.0, 2*FLAG_ROD_R + 1.0, 0).extrude(10).translate((DROP_X - 0.5, RAIL_Y_TRIP, -8)))
+    deck = deck.cut(cq.Workplane("XY").box(12.4, 3.4, 10, centered=(True, False, False)).translate((BAL_XY[0], BAL_XY[1] + 3.8, -8)))  # hanger-plate slot
+    add(deck, "deck plate", COL["frame"], 0)
     add(pillars(), "pillars", COL["steel"], -20)
     add(feet(), "feet", COL["rubber"], -50)
     add(side_window_frame(), "balance window", "#a9d6e5", -20)
@@ -413,21 +649,33 @@ def build(cassette="10 mL/h", fill=0.85, exploded=0.0):
     add(load_run_lever(), "LOAD/RUN interlock lever", COL["flag"], 70)
     bar, stopper, plunger, thumb_x = syringe(fill)
     xc = thumb_x + 3 + 10 + 2 + CAR_LEN/2      # pusher jaw face against the thumb press
+    if xc_override is not None: xc = xc_override
     assert CAR_X_MIN - 1 <= xc <= CAR_X_MAX + 1, xc
     add(bar, "syringe barrel (BD 20 mL)", COL["syringe"], 60)
     add(stopper, "plunger stopper", COL["rubber"], 60)
     add(plunger, "plunger", COL["syringe"], 60)
     add(carriage(xc), "carriage + rack", COL["print"], 50)
-    add(pusher_head(xc), "pusher head + trip stem", COL["print2"], 50)
-    add(trip_spring(xc), "occlusion trip spring", COL["spring"], 50)
-    knob, flag = trip_knob_and_flag(xc)
-    add(knob, "trip preload knob", COL["print2"], 50); add(flag, "occlusion flag", COL["flag"], 50)
+    tm, t_spacer = trip_mechanism(xc, tripped, stem_advance=stem_advance)
+    tcol = dict(pusher=COL["steel"], spacer=COL["print2"], trip_spring=COL["spring"], sear=COL["print2"], sear_pin=COL["steel"],
+                sear_boss=COL["print"], sear_spring=COL["spring"], flag_rod=COL["flag"], flag_boss=COL["print"], flag_spring=COL["spring"],
+                rocker=COL["print2"], rocker_boss=COL["print"], rocker_pin=COL["steel"], rocker_spring=COL["spring"],
+                capture_pin=COL["steel"], capture_boss=COL["print"])
+    tname = dict(pusher="pusher head + trip stem", spacer=f"trip preload spacer ({t_spacer:.1f} mm)", trip_spring="occlusion trip spring",
+                 sear="trip sear", sear_pin="sear pivot pin", sear_boss="sear boss", sear_spring="sear return spring",
+                 flag_rod="flag rod + occlusion flag", flag_boss="flag rod guide", flag_spring="flag spring",
+                 rocker="capture rocker", rocker_boss="rocker boss", rocker_pin="rocker pivot pin", rocker_spring="rocker torsion spring",
+                 capture_pin="stem capture pin", capture_boss="capture pin guide")
+    for k, p in tm.items(): add(p, tname[k], tcol[k], 50)
+    rl_name = dict(trip_rail="trip rail", rail_posts="trip rail posts", rail_cranks="trip rail cranks", rail_pins="trip rail pivot pins",
+                   stop_linkage="drop rod + balance stop fork")
+    for k, p in trip_rail_linkage(xc, tripped).items():
+        add(p, rl_name[k], COL["steel"] if k in ("stop_linkage", "rail_pins") else COL["print2"], 80)
     drum, coil, bracket, axle = spring_drum()
     add(drum, "spring drum", COL["print"], 20); add(coil, "constant-force spring coil", COL["spring"], 20)
     add(bracket, "drum bracket", COL["print"], 20); add(axle, "drum axle", COL["steel"], 20)
     add(spring_tape(xc), "spring tape", COL["spring"], 20)
     for k, s in shafts().items(): add(s, f"shaft {k}", COL["steel"], 0)
-    for k, g in gear_train(cassette).items():
+    for k, g in gear_train(cassette, xc).items():
         add(g, k, COL["print2"] if "cassette" in k else (COL["brass"] if "escape" in k else COL["print"]), -10 if "cassette" in k else 0)
     add(ratchet_click(), "winding ratchet click", COL["steel"], 0)
     add(cassette_plate(), f"rate cassette plate ({cassette})", COL["print2"], -10)
@@ -435,12 +683,54 @@ def build(cassette="10 mL/h", fill=0.85, exploded=0.0):
         add(p, k, COL["steel"] if "pin" in k else COL["print2"], -30)
     for k, p in balance_assembly().items():
         c = {"balance": COL["print"], "trims": COL["brass"], "impulse_pin": COL["steel"], "band_upper": COL["band"], "band_lower": COL["band"],
-             "upper_clamp": COL["frame"], "lower_clamp": COL["frame"], "tensioner": COL["spring"], "tensioner_guide": COL["frame"]}[k]
+             "upper_clamp": COL["frame"], "upper_post": COL["frame"], "lower_clamp": COL["frame"], "tensioner": COL["spring"],
+             "tensioner_seat": COL["frame"], "tensioner_guide": COL["frame"], "clamp_screws": COL["steel"]}[k]
+        if balance_angle and k in ("balance", "trims", "impulse_pin"):
+            p = p.rotate((BAL_XY[0], BAL_XY[1], 0), (BAL_XY[0], BAL_XY[1], 1), math.degrees(balance_angle))
         add(p, f"balance {k}", c, -30)
     return asm, xc
 
-if __name__ == "__main__":
-    asm, xc = build()
+def _safe(n):
+    import re
+    return re.sub(r"[^A-Za-z0-9]+", "_", n).strip("_")
+
+def export_stls(asm, out_dir, manifest, tol=0.05, ang=0.2):
+    """One STL per assembly child + a JSON manifest (name, file, colour); returns the names of non-watertight meshes."""
+    import json, os
+    os.makedirs(out_dir, exist_ok=True)
+    man, bad = [], []
+    for ch in asm.children:
+        shp = ch.obj.val() if hasattr(ch.obj, "val") else ch.obj
+        fn = f"{out_dir}/{_safe(ch.name)}.stl"
+        cq.exporters.export(cq.Workplane().add(shp), fn, tolerance=tol, angularTolerance=ang)
+        col = ch.color.toTuple()[:3] if ch.color is not None else (0.6, 0.6, 0.6)
+        man.append(dict(name=ch.name, file=fn, color=list(col)))
+        try:
+            import trimesh
+            if not trimesh.load(fn, force="mesh").is_watertight: bad.append(ch.name)
+        except ImportError:
+            pass
+    json.dump(man, open(manifest, "w"), indent=1)
+    return man, bad
+
+def export_all(cassette="10 mL/h", fill=0.85):
+    """STEP + GLB + per-part STLs (armed pose), STLs of the tripped pose for the figure, layout.json, STL zip."""
+    import json, zipfile, shutil
+    asm, xc = build(cassette=cassette, fill=fill)
     asm.save(f"{OUT}/chronoflow_assembly.step")
     asm.save(f"{OUT}/chronoflow_assembly.glb", tolerance=0.3, angularTolerance=0.5)
-    print("carriage centre", xc, "children", len(asm.children))
+    shutil.rmtree(f"{OUT}/stl", ignore_errors=True); shutil.rmtree(f"{OUT}/stl_tripped", ignore_errors=True)
+    man, bad = export_stls(asm, f"{OUT}/stl", f"{OUT}/manifest.json")
+    asm_t, _ = build(cassette=cassette, fill=fill, tripped=True)
+    export_stls(asm_t, f"{OUT}/stl_tripped", f"{OUT}/manifest_tripped.json")
+    json.dump(dict(shafts=S, levels=LV, balance_xy=BAL_XY, deck_z=DECK_Z, bottom_z=BOTTOM_Z, carriage_xc=xc, n_parts=len(asm.children),
+                   trip=dict(sense_travel_mm=SENSE_TRAVEL, flag_travel_mm=FLAG_TRAVEL, sear_ratio=SEAR_RATIO, crank_posts=CRANK_POSTS,
+                             stop_angles_deg=STOP_ANGLES, stop_r_mm=STOP_R)), open(f"{OUT}/layout.json", "w"), indent=1)
+    with zipfile.ZipFile(f"{OUT}/chronoflow_stl_parts.zip", "w", zipfile.ZIP_DEFLATED) as z:
+        for m in man: z.write(m["file"], arcname=m["file"].split("/")[-1])
+        z.write(f"{OUT}/manifest.json", arcname="manifest.json")
+    return asm, xc, man, bad
+
+if __name__ == "__main__":
+    asm, xc, man, bad = export_all()
+    print("carriage centre", round(xc, 2), "children", len(asm.children), "non-watertight:", bad)

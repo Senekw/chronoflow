@@ -7,6 +7,11 @@ import os, json, importlib
 import numpy as np, pandas as pd
 import matplotlib as mpl, matplotlib.pyplot as plt
 import design_params as dp, analysis_oscillator as ao, analysis_escapement as ae
+try:                      # figure helpers: kernel plugins (figure-style / figure-composer) or the standalone fallback
+    apply_figure_style
+except NameError:
+    import os as _os, sys as _sys; _sys.path.append(_os.path.dirname(_os.path.abspath(__file__)) if "__file__" in globals() else _os.getcwd())
+    from figstyle import apply_figure_style, panel_letter, META_GREY, end_of_line_labels, compose_figure, panel_px
 importlib.reload(dp); importlib.reload(ao); importlib.reload(ae)
 
 os.makedirs("results", exist_ok=True); os.makedirs("figures", exist_ok=True)

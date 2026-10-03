@@ -51,5 +51,20 @@
   -80.0,
   -74.0
  ],
- "carriage_xc": 199.146506762129
+ "carriage_xc": 203.146506762129,
+ "n_parts": 91,
+ "trip": {
+  "sense_travel_mm": 0.35,
+  "flag_travel_mm": 6.0,
+  "sear_ratio": 4.5,
+  "crank_posts": [
+   70.0,
+   238.0
+  ],
+  "stop_angles_deg": [
+   80.0,
+   100.0
+  ],
+  "stop_r_mm": 18.0
+ }
 }
