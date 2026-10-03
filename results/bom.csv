@@ -1,0 +1,12 @@
+item,qty,unit_usd,ext_usd
+"Printed parts (PETG, ~420 g incl. supports)",1,9.0,9.0
+"Constant-force spring 3.4 lbf x 1.5 m (x2, parallel)",2,6.5,13.0
+"Feeler gauge 0.0015"" blade (taut band stock)",1,1.5,1.5
+"Steel coil spring, tensioner (1 N @ 5 mm)",1,0.4,0.4
+Steel pins 3 mm x 50 mm (gear shafts),8,0.3,2.4
+"Steel pins 1 mm (impulse pin, pallets, latches)",4,0.1,0.4
+Brass M3 hex nuts (trim weights),4,0.08,0.32
+"Compression spring, occlusion trip 8-20 N @ 3 mm",1,0.6,0.6
+"M3 hardware (screws, heat-set inserts)",20,0.08,1.6
+Linear rods 6 mm x 200 mm (carriage rails),2,1.8,3.6
+"Rate cassettes (printed gear sets), 4",4,1.2,4.8

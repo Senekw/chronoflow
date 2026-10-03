@@ -1,0 +1,7 @@
+numpy
+scipy
+pandas
+matplotlib
+trimesh
+numpy-stl
+cadquery>=2.4
