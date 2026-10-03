@@ -1,101 +1,123 @@
 {
  "oscillator": {
-  "k_Nm_per_rad": 0.0002962926933333333,
+  "k_Nm_per_rad": 0.00029523676096236847,
   "balance_mass_g": 7.428194297268482,
-  "I_kgm2": 5.196932181191868e-06,
-  "f_Hz": 1.2017304836466014,
+  "I_kgm2": 5.178802761191868e-06,
+  "f_Hz": 1.201685061108392,
   "f_target": 1.2016772515588041,
-  "trim_radius_mm": 26.599999999999998,
+  "trim_radius_mm": 26.41,
   "regulation_range_Hz": [
-   1.174886670047178,
-   1.2407090359363073
+   1.1727912620485144,
+   1.238496233881271
   ],
   "regulation_range_pct": [
-   -2.2294323602176536,
-   3.2481087851893298
+   -2.4038059697659375,
+   3.063965992091955
   ],
   "orientation_Hz": {
-   "band horizontal (device flat)": 1.2017304836466014,
-   "band vertical, fixed clamp up": 1.2036992380384712,
-   "band vertical, fixed clamp down": 1.1997584986140304
+   "band horizontal (device flat)": 1.201685061108392,
+   "band vertical, fixed clamp up": 1.2039299409271913,
+   "band vertical, fixed clamp down": 1.1994359797509868
   },
-  "orientation_max_pct": 0.16409544897181272,
-  "shear_stress_at_theta_max_MPa": 153.6,
+  "orientation_max_pct": 0.18716063219847978,
+  "shear_stress_at_theta_max_MPa": 166.25454545454548,
   "fatigue_limit_MPa": 350.0,
-  "tempco_per_K": -0.00017829985772626993,
-  "band_sag_mm": 0.4554411628512739
+  "tempco_per_K": -0.00017665683119353804,
+  "band_sag_mm": 0.400788223309121
  },
  "escapement": {
   "T_min_arm_Nm": 9.549296585513721e-06,
-  "arm_rate_error_pct_Q150": 0.056686057140145726,
+  "arm_rate_error_pct_Q150": 0.05658920943440678,
   "arm_rate_error_range_pct": [
-   0.011710831961292018,
-   0.45126902987507816
+   0.011700734583471841,
+   0.45015889002501186
   ],
   "arm_amplitude_range_rad": [
-   0.3060061139756122,
-   0.9878278444802824
+   0.3065503162487238,
+   0.989325579584851
   ]
  },
  "operating": {
-  "F_excess_min_N": 15.5,
-  "F_excess_max_N": 28.5,
-  "worst_margin": 1.7951970016308108,
+  "F_spring_N": 44.5,
+  "F_excess_min_N": 17.60580380031252,
+  "F_excess_max_N": 43.0,
+  "worst_margin": 2.0390894318465396,
+  "worst_case": {
+   "syringe": "BD 60 mL",
+   "cassette": "1 mL/h",
+   "pressure_mmHg": 300.0
+  },
   "train_efficiency": 0.5760372512768,
+  "n_gear_meshes": 6,
   "power_range_uW": [
-   14.979915928316993,
-   275.43716384324796
-  ]
+   17.01506198575002,
+   415.5718612371811
+  ],
+  "torque_range_uNm": [
+   19.471869749089276,
+   475.5763546541262
+  ],
+  "torque_dynamic_range": 24.423764167607455,
+  "rev1_30N": {
+   "worst_margin": 0.3597115916112652,
+   "n_stall_cells": 2,
+   "n_below_1p7": 4,
+   "n_cells": 80,
+   "stalled": [
+    "BD 60 mL / 2 mL/h / 300 mmHg",
+    "BD 60 mL / 1 mL/h / 300 mmHg"
+   ]
+  }
  },
  "comparison": {
   "restriction_err_at_37C_pct": 45.22967468717223,
   "restriction_err_at_10C_pct": -23.185329109707453,
   "chrono_err_10_to_40C_pct": [
-   -0.3565997154525399,
-   0.17829985772626994
+   -0.35331366238707607,
+   0.17665683119353803
   ],
   "restriction_err_100mmHg_back_Pd300": -33.33333333333333
  },
  "montecarlo": {
-  "p2_5": -1.1346506371731635,
-  "p97_5": 1.138997574356871,
-  "p99": 1.3547686411764284,
-  "sd": 0.6333541664860346,
+  "p2_5": -1.1398338171608335,
+  "p97_5": 1.1463723847462952,
+  "p99": 1.363118637668369,
+  "sd": 0.6354085930473069,
   "contrib_sd_pct": {
    "calibration": 0.17348378778804843,
-   "temperature": 0.1032230147673687,
-   "orientation": 0.09469383709820303,
-   "escapement": 0.04595551313991183,
+   "temperature": 0.10227181853976579,
+   "orientation": 0.10800396066830514,
+   "escapement": 0.04585037998451538,
    "syringe": 0.5760675436045236,
    "rack": 0.11458974493593023
   }
  },
  "structure": {
-  "stage1_tooth_bending_MPa": 15.306122448979592,
+  "stage1_tooth_bending_MPa": 22.70408163265306,
   "petg_yield_MPa": 50.0,
-  "safety_factor": 3.2666666666666666,
-  "rack_pinion_torque_mNm": 180.0,
+  "safety_factor": 2.202247191011236,
+  "rack_pinion_torque_mNm": 267.0,
   "stage_torques": [
    {
     "stage": 1,
-    "torque_in_mNm": 180.0
+    "torque_in_mNm": 267.0
    },
    {
     "stage": 2,
-    "torque_in_mNm": 33.12
+    "torque_in_mNm": 49.12800000000001
    },
    {
     "stage": 3,
-    "torque_in_mNm": 6.09408
+    "torque_in_mNm": 9.039552
    },
    {
     "stage": 4,
-    "torque_in_mNm": 1.12131072
+    "torque_in_mNm": 1.6632775680000003
    }
   ]
  },
  "energy": {
-  "spring_energy_J": 2.85,
+  "spring_energy_J": 4.2275,
   "escapement_power_uW": 5.0951115466093295,
   "escapement_energy_20h_J": 0.3668480313558717,
   "runtime_h_20mL": {
@@ -106,26 +128,84 @@
   }
  },
  "occlusion": {
-  "BD 5 mL": {
-   "trip_setting_N": 6.0688570668530435,
-   "pressure_with_default_14p5N_mmHg": 853.6051670984443
+  "per_syringe": {
+   "BD 5 mL": {
+    "trip_setting_N": 6.0688570668530435,
+    "preload_mm": 2.022952355617681,
+    "pressure_band_mmHg": [
+     201.5070961040257,
+     300.0,
+     398.49290389597434
+    ],
+    "pressure_band_pct": [
+     -32.83096796532477,
+     32.83096796532479
+    ],
+    "force_after_3mm_trip_travel_N": 15.068857066853043
+   },
+   "BD 10 mL": {
+    "trip_setting_N": 8.604637112295435,
+    "preload_mm": 2.868212370765145,
+    "pressure_band_mmHg": [
+     231.8660522374101,
+     300.0,
+     368.1339477625899
+    ],
+    "pressure_band_pct": [
+     -22.711315920863306,
+     22.711315920863306
+    ],
+    "force_after_3mm_trip_travel_N": 17.604637112295435
+   },
+   "BD 20 mL": {
+    "trip_setting_N": 14.495897851322658,
+    "preload_mm": 4.831965950440886,
+    "pressure_band_mmHg": [
+     260.8556020747675,
+     300.0,
+     339.14439792523257
+    ],
+    "pressure_band_pct": [
+     -13.04813264174417,
+     13.048132641744182
+    ],
+    "force_after_3mm_trip_travel_N": 23.49589785132266
+   },
+   "BD 30 mL": {
+    "trip_setting_N": 18.292188203609022,
+    "preload_mm": 6.097396067869674,
+    "pressure_band_mmHg": [
+     269.57853741407854,
+     300.0,
+     330.4214625859214
+    ],
+    "pressure_band_pct": [
+     -10.140487528640485,
+     10.140487528640474
+    ],
+    "force_after_3mm_trip_travel_N": 27.292188203609022
+   },
+   "BD 60 mL": {
+    "trip_setting_N": 26.89419619968748,
+    "preload_mm": 8.964732066562494,
+    "pressure_band_mmHg": [
+     279.9055078383979,
+     300.00000000000006,
+     320.09449216160215
+    ],
+    "pressure_band_pct": [
+     -6.698164053867384,
+     6.6981640538673615
+    ],
+    "force_after_3mm_trip_travel_N": 35.894196199687485
+   }
   },
-  "BD 10 mL": {
-   "trip_setting_N": 8.604637112295435,
-   "pressure_with_default_14p5N_mmHg": 567.7828980215828
-  },
-  "BD 20 mL": {
-   "trip_setting_N": 14.495897851322658,
-   "pressure_with_default_14p5N_mmHg": 300.10705076011624
-  },
-  "BD 30 mL": {
-   "trip_setting_N": 18.292188203609022,
-   "pressure_with_default_14p5N_mmHg": 223.09072563009036
-  },
-  "BD 60 mL": {
-   "trip_setting_N": 26.89419619968748,
-   "pressure_with_default_14p5N_mmHg": 133.9632810773475
-  }
+  "spring_rate_N_per_mm": 3.0,
+  "preload_range_N": [
+   6.0,
+   27.0
+  ],
+  "friction_uncertainty_N": 1.5
  },
  "resolution_uL_per_beat": {
   "10 mL/h": 1.1557919458716857,
@@ -133,5 +213,5 @@
   "2 mL/h": 0.23115838917433718,
   "1 mL/h": 0.11557919458716859
  },
- "bom_total_usd": 37.62
+ "bom_total_usd": 39.919999999999995
 }

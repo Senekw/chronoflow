@@ -62,19 +62,35 @@ R["escapement"] = dict(T_min_arm_Nm=(dp.E_IMPULSE/dp.LIFT_EFF)/(np.pi/dp.Z_ESCAP
     arm_rate_error_range_pct=[float(qt.rate_error.min()*100), float(qt.rate_error.max()*100)],
     arm_amplitude_range_rad=[float(qt.amplitude.min()), float(qt.amplitude.max())])
 
-# ---------------------------------------------------------------- operating map (stall margin)
-F_min = dp.F_SPRING - dp.F_TRIP                       # excess force at the occlusion trip point
-F_max = dp.F_SPRING - min(s["friction"] for s in dp.SYRINGES.values())
+# ---------------------------------------------------------------- operating map (stall margin): syringe x cassette x back-pressure
+T_MIN = R["escapement"]["T_min_arm_Nm"]
+P_GRID = (0.0, 100.0, 200.0, 300.0)                       # mmHg downstream pressure; 300 = occlusion trip for every syringe
 op = []
-for cname, z in dp.CASSETTES.items():
-    Q = dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(z))
-    for Fx in (F_min, F_max):
-        Te, P, eta = ae.escape_wheel_torque(Fx, Q)
-        op.append(dict(cassette=cname, F_excess_N=Fx, power_uW=P*1e6, T_e_uNm=Te*1e6,
-                       margin=Te/R["escapement"]["T_min_arm_Nm"]))
+for sname, s in dp.SYRINGES.items():
+    for cname, z in dp.CASSETTES.items():
+        Q20 = dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(z))          # carriage speed is set by the cassette, not the syringe
+        for Pmm in P_GRID:
+            F_plunger = Pmm * 133.322 * s["area_mm2"] * 1e-6 + s["friction"]
+            Fx = dp.F_SPRING - F_plunger
+            Te, P, eta = ae.escape_wheel_torque(Fx, Q20)
+            op.append(dict(syringe=sname, cassette=cname, pressure_mmHg=Pmm, F_plunger_N=F_plunger, F_excess_N=Fx,
+                           power_uW=P*1e6, T_e_uNm=Te*1e6, margin=Te/T_MIN, flow_mL_h=dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(z), s["area_mm2"])))
 opm = pd.DataFrame(op); opm.to_csv("results/operating_map.csv", index=False)
-R["operating"] = dict(F_excess_min_N=F_min, F_excess_max_N=F_max, worst_margin=float(opm.margin.min()),
-                      train_efficiency=float(eta), power_range_uW=[float(opm.power_uW.min()), float(opm.power_uW.max())])
+F_min = float(opm.F_excess_N.min()); F_max = float(opm.F_excess_N.max())
+worst = opm.loc[opm.margin.idxmin()]
+# the same map for the rev-1 drive spring (30 N), to document why the spring was raised
+op1 = opm.copy(); op1["F_excess_N"] = 30.0 - op1.F_plunger_N
+op1["T_e_uNm"] = [ae.escape_wheel_torque(fx, dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(dp.CASSETTES[c])))[0]*1e6 for fx, c in zip(op1.F_excess_N, op1.cassette)]
+op1["margin"] = op1.T_e_uNm*1e-6 / T_MIN; op1.to_csv("results/operating_map_rev1_30N.csv", index=False)
+R["operating"] = dict(F_spring_N=dp.F_SPRING, F_excess_min_N=F_min, F_excess_max_N=F_max, worst_margin=float(worst.margin),
+                      worst_case=dict(syringe=worst.syringe, cassette=worst.cassette, pressure_mmHg=float(worst.pressure_mmHg)),
+                      train_efficiency=float(eta), n_gear_meshes=len(dp.STAGES) + 2,
+                      power_range_uW=[float(opm.power_uW.min()), float(opm.power_uW.max())],
+                      torque_range_uNm=[float(opm.T_e_uNm.min()), float(opm.T_e_uNm.max())],
+                      torque_dynamic_range=float(opm.T_e_uNm.max()/opm.T_e_uNm.min()),
+                      rev1_30N=dict(worst_margin=float(op1.margin.min()), n_stall_cells=int((op1.margin < 1).sum()),
+                                    n_below_1p7=int((op1.margin < 1.7).sum()), n_cells=int(len(op1)),
+                                    stalled=[f"{r.syringe} / {r.cassette} / {r.pressure_mmHg:.0f} mmHg" for r in op1[op1.margin < 1].itertuples()]))
 
 # ---------------------------------------------------------------- accuracy vs flow-restriction pumps
 def mu_water(T_C):  # Vogel equation, mPa s
@@ -128,21 +144,25 @@ R["energy"] = dict(spring_energy_J=E_spring, escapement_power_uW=P_esc*1e6,
                    runtime_h_20mL={c: 20/dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(z)) for c, z in dp.CASSETTES.items()})
 occ = {}
 for sname, s in dp.SYRINGES.items():
-    F_set = 300/dp.MMHG_PER_PA * s["area_mm2"]*1e-6 + s["friction"]
-    occ[sname] = dict(trip_setting_N=F_set, pressure_with_default_14p5N_mmHg=(dp.F_TRIP - s["friction"])/(s["area_mm2"]*1e-6)*dp.MMHG_PER_PA)
-R["occlusion"] = occ
+    F_set = dp.trip_force(sname)
+    lo, nom, hi = dp.trip_pressure_range(sname)
+    occ[sname] = dict(trip_setting_N=F_set, preload_mm=F_set/dp.TRIP_SPRING_RATE,
+                      pressure_band_mmHg=[lo, nom, hi], pressure_band_pct=[(lo/nom-1)*100, (hi/nom-1)*100],
+                      force_after_3mm_trip_travel_N=F_set + dp.TRIP_SPRING_RATE*dp.TRIP_TRAVEL)
+R["occlusion"] = dict(per_syringe=occ, spring_rate_N_per_mm=dp.TRIP_SPRING_RATE, preload_range_N=list(dp.TRIP_RANGE),
+                      friction_uncertainty_N=dp.FRICTION_UNCERTAINTY)
 R["resolution_uL_per_beat"] = {c: float(flow_tab[(flow_tab.cassette == c) & (flow_tab.syringe == dp.DESIGN_SYRINGE)].uL_per_beat.iloc[0]) for c in dp.CASSETTES}
 
 # ---------------------------------------------------------------- BOM (indicative unit prices, USD, small quantities)
 bom = [
  ("Printed parts (PETG, ~420 g incl. supports)", 1, 9.00),
- ("Constant-force spring 3.4 lbf x 1.5 m (x2, parallel)", 2, 6.50),
- ("Feeler gauge 0.0015\" blade (taut band stock)", 1, 1.50),
+ ("Constant-force spring 5 lbf (22.2 N) x 1.5 m (x2, parallel)", 2, 7.50),
+ ("Feeler gauge 0.0015\" (38.1 um) blade (taut band stock)", 1, 1.50),
  ("Steel coil spring, tensioner (1 N @ 5 mm)", 1, 0.40),
  ("Steel pins 3 mm x 50 mm (gear shafts)", 8, 0.30),
  ("Steel pins 1 mm (impulse pin, pallets, latches)", 4, 0.10),
  ("Brass M3 hex nuts (trim weights)", 4, 0.08),
- ("Compression spring, occlusion trip 8-20 N @ 3 mm", 1, 0.60),
+ ("Compression spring, occlusion trip 3 N/mm + 5 keyed preload spacers (6-27 N)", 1, 0.90),
  ("M3 hardware (screws, heat-set inserts)", 20, 0.08),
  ("Linear rods 6 mm x 200 mm (carriage rails)", 2, 1.80),
  ("Rate cassettes (printed gear sets), 4", 4, 1.20),
@@ -174,7 +194,7 @@ ax.axhline(dp.THETA_MAX, color=META_GREY, lw=0.8, ls="--"); ax.text(480, dp.THET
 lo, hi = opm.T_e_uNm.min(), opm.T_e_uNm.max()
 ax.axvspan(lo, hi, color="#dddddd", alpha=0.5, lw=0); ax.text(np.sqrt(lo*hi), 0.08, "operating range\n(all rates, all loads)", ha="center", fontsize=7, color="#444444")
 ax.set_xscale("log"); ax.set_xlabel("escape-wheel torque (µN·m)"); ax.set_ylabel("balance amplitude (rad)")
-ax.set_title("Spring-arm: constant amplitude over 18× torque")
+ax.set_title(f"Spring-arm: constant amplitude over {R['operating']['torque_dynamic_range']:.0f}× torque")
 ax.set_xticks([1, 10, 100]); ax.set_xticklabels(["1", "10", "100"]); ax.set_ylim(-0.05, 1.8); ax.margins(x=0.04)
 ax.legend(frameon=False, loc="upper left", fontsize=7, bbox_to_anchor=(0.0, 0.93))
 ax = axs[1]
@@ -231,17 +251,31 @@ ax.set_xlim(-5, 5); ax.axvspan(-5, 5, color="#e8f1e8", lw=0, zorder=0)
 panel_letter(axs[0], "a"); panel_letter(axs[1], "b")
 fig.savefig("figures/fig4_error_budget.png", dpi=300)
 
-# --- Fig 5: operating map (power & stall margin)
-fig, ax = plt.subplots(figsize=(3.6, 2.9), constrained_layout=True)
-cas = list(dp.CASSETTES)
+# --- Fig 5: operating map (stall margin over syringe x cassette, at the 300 mmHg trip and free-running)
+fig, axs = plt.subplots(1, 2, figsize=(7.2, 2.9), constrained_layout=True, gridspec_kw=dict(width_ratios=[1.15, 1]))
+cas = list(dp.CASSETTES); syr = list(dp.SYRINGES)
+ax = axs[0]
+M = np.array([[opm[(opm.syringe == s_) & (opm.cassette == c_) & (opm.pressure_mmHg == 300.0)].margin.iloc[0] for s_ in syr] for c_ in cas])
+im = ax.imshow(M, cmap="Blues", norm=mpl.colors.LogNorm(vmin=1, vmax=M.max()*1.1), aspect="auto")
+for i in range(len(cas)):
+    for j in range(len(syr)):
+        ax.text(j, i, f"{M[i, j]:.1f}×", ha="center", va="center", fontsize=7, color="white" if M[i, j] > 4 else "black")
+ax.set_xticks(range(len(syr))); ax.set_xticklabels([s_.replace("BD ", "") for s_ in syr]); ax.set_yticks(range(len(cas))); ax.set_yticklabels([c_.replace(" mL/h", "") for c_ in cas])
+ax.set_xlabel("syringe (BD)"); ax.set_ylabel("cassette (mL/h on 20 mL)")
+ax.set_title(f"Margin at the 300 mmHg trip (worst {M.min():.1f}×: {worst.syringe.replace('BD ', '')}, {worst.cassette})")
+ax = axs[1]
 x = np.arange(len(cas))
-for j, (Fx, col, lab) in enumerate(((F_min, "#9ecae1", f"at occlusion trip (excess {F_min:.1f} N)"), (F_max, C_ARM, f"free-running (excess {F_max:.1f} N)"))):
-    d = opm[np.isclose(opm.F_excess_N, Fx)]
+for j, (Pmm, col, lab) in enumerate(((300.0, "#9ecae1", "60 mL at 300 mmHg trip (excess %.1f N)" % F_min), (0.0, C_ARM, "5 mL free-running (excess %.1f N)" % F_max))):
+    sname = "BD 60 mL" if Pmm == 300.0 else "BD 5 mL"
+    d = opm[(opm.syringe == sname) & (opm.pressure_mmHg == Pmm)].set_index("cassette").loc[cas]
     ax.bar(x + (j-0.5)*0.38, d.margin, width=0.36, color=col, label=lab)
 ax.axhline(1, color="#c0392b", lw=0.9); ax.text(len(cas)-0.55, 1.12, "stall threshold", color="#c0392b", fontsize=7, ha="right")
-ax.set_yscale("log"); ax.set_yticks([1, 10, 100]); ax.set_yticklabels(["1×", "10×", "100×"])
-ax.set_xticks(x); ax.set_xticklabels([c.replace(" mL/h", "") for c in cas]); ax.set_xlabel("rate cassette (mL/h, BD 20 mL)")
-ax.set_ylabel("escape-wheel torque / re-cock minimum"); ax.set_title("Torque margin ≥ 1.7× at every rate, down to the trip point")
+r1 = op1[(op1.syringe == "BD 60 mL") & (op1.pressure_mmHg == 300.0)].set_index("cassette").loc[cas]
+ax.plot(x - 0.19, r1.margin, "x", color="#c0392b", ms=6, label="rev 1 (30 N spring): 60 mL at trip")
+ax.set_yscale("log"); ax.set_yticks([0.3, 1, 10, 100]); ax.set_yticklabels(["0.3×", "1×", "10×", "100×"])
+ax.set_xticks(x); ax.set_xticklabels([c_.replace(" mL/h", "") for c_ in cas]); ax.set_xlabel("rate cassette (mL/h, BD 20 mL)")
+ax.set_ylabel("escape-wheel torque / re-cock minimum"); ax.set_title(f"Extremes of the map: {F_min:.0f}–{F_max:.0f} N excess")
 ax.legend(frameon=False, fontsize=6.5, loc="upper right"); ax.margins(y=0.15)
+panel_letter(axs[0], "a"); panel_letter(axs[1], "b")
 fig.savefig("figures/fig5_operating_map.png", dpi=300)
 print(json.dumps({kk: R[kk] for kk in ("oscillator", "escapement", "operating", "montecarlo", "comparison", "structure", "energy", "bom_total_usd", "resolution_uL_per_beat")}, indent=0, default=float)[:3500])

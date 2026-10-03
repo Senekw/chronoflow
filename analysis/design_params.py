@@ -24,8 +24,21 @@ SYR_VOL_ML = 20.0
 SYR_STROKE = SYR_VOL_ML * 1000 / SYR_AREA  # mm of travel for 20 mL
 
 # ---------------------------------------------------------------- energy source: constant-force (Neg'ator) spring
-F_SPRING = 30.0            # N  (two 3.4 lbf constant-force springs in parallel, e.g. Vulcan SH-series)
-F_TRIP = 14.5              # N  occlusion trip preload on the pusher stem (= 300 mmHg x 287 mm2 + 3 N friction, BD 20 mL); knob-adjustable 8-20 N
+F_SPRING = 44.5            # N  (two 5 lbf = 22.2 N constant-force springs in parallel, e.g. Vulcan SH-series)
+                           #    rev 2: raised from 30 N so that the BD 60 mL syringe at its 300 mmHg trip (26.9 N) still
+                           #    leaves >= 17 N excess for the train (30 N gave 3.1 N -> escapement stalled before the trip)
+F_TRIP = 14.5              # N  occlusion trip preload for the DESIGN syringe (= 300 mmHg x 287 mm2 + 3 N friction, BD 20 mL)
+TRIP_SPRING_RATE = 3.0     # N/mm, trip compression spring; preload set by a keyed spacer on each syringe cradle insert
+TRIP_RANGE = (6.0, 27.0)   # N  preload range the spacer set must cover (BD 5 mL ... BD 60 mL at 300 mmHg)
+FRICTION_UNCERTAINTY = 1.5 # N  +/- plunger glide-force uncertainty (lot, speed, dwell) -> occlusion-pressure calibration band
+def trip_force(syringe, p_mmHg=300.0):
+    """Trip preload for a syringe: p x area + nominal running friction."""
+    s = SYRINGES[syringe]
+    return p_mmHg * 133.322 * s["area_mm2"] * 1e-6 + s["friction"]
+def trip_pressure_range(syringe, F_set=None):
+    """Pressure at which a force trip set to F_set actually fires, for friction +/- FRICTION_UNCERTAINTY (mmHg, low/nominal/high)."""
+    s = SYRINGES[syringe]; F_set = trip_force(syringe) if F_set is None else F_set
+    return tuple((F_set - (s["friction"] + df)) / (s["area_mm2"] * 1e-6) / 133.322 for df in (FRICTION_UNCERTAINTY, 0.0, -FRICTION_UNCERTAINTY))
 TRIP_TRAVEL = 3.0          # mm stem retraction that flags and stops the oscillator
 SPRING_DRUM_D = 25.0       # mm drum diameter
 TRAVEL = 95.0              # mm carriage travel (covers 20 mL BD stroke 69.6 mm + loading margin)
@@ -73,9 +86,11 @@ LIFT_EFF = 0.6             # efficiency of the wheel re-lifting the arm (frictio
 
 # ---------------------------------------------------------------- oscillator: taut-band suspended balance
 F_TARGET = None            # Hz, derived below from the flow requirement
-BAND_T = 0.04e-3           # m, feeler-gauge spring steel ribbon thickness (0.0015")
+BAND_T = 38.1e-6           # m, feeler-gauge spring steel ribbon thickness: 0.0015 in = 38.1 um (rev 2: was modelled as 40 um)
+BAND_T_TOL = 2.5e-6        # m, +/- thickness tolerance of feeler stock (drives the coarse length adjustment below)
 BAND_W = 2.0e-3            # m, ribbon width (cut from a 12.7 mm blade)
-BAND_LH = 25.0e-3          # m, free length of each half-band (clamp to balance hub)
+BAND_LH = 22.0e-3          # m, free length of each half-band (clamp to balance hub); rev 2: 25 -> 22 mm for the 38.1 um ribbon
+BAND_LH_MIN, BAND_LH_MAX = 18.0e-3, 26.5e-3   # m, coarse adjustment of the fixed clamp (slotted post) to absorb +/-2.5 um stock thickness
 BAND_T0 = 1.0              # N, pretension from a steel coil spring tensioner
 BAL_R_OUT = 31.0e-3        # m, balance ring outer radius
 BAL_R_IN = 27.0e-3         # m

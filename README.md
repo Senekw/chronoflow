@@ -7,13 +7,15 @@ Design-and-simulation study: parametric 3D CAD (66 parts, interference-checked),
 ![overview](figures/manuscript/fig1.png)
 
 ## What it is
-A wind-up syringe driver that meters **volume**, not pressure. Two constant-force springs (30 N) push the plunger; a rack-and-pinion drives a printed 312.5:1 step-up train into a clockwork escapement whose balance wheel sets the rate. Plug-in gear cassettes give 1 / 2 / 5 / 10 mL/h on a BD 20 mL syringe (0.4–19.5 mL/h across 5–60 mL syringes).
+A wind-up syringe driver that meters **volume**, not pressure. Two constant-force springs (44.5 N) push the plunger; a rack-and-pinion drives a printed 312.5:1 step-up train into a clockwork escapement whose balance wheel sets the rate. Plug-in gear cassettes give 1 / 2 / 5 / 10 mL/h on a BD 20 mL syringe (0.4–19.5 mL/h across 5–60 mL syringes).
 
 Two design results carry the project:
-1. **Constant-force spring-arm escapement** — train torque varies 18× across rates and loads (17–315 µN·m); a conventional lever escapement over-banks, the spring-arm design holds amplitude constant with a period error of 0.06 %.
-2. **Taut-band balance** — a 0.04 × 2 mm feeler-gauge steel ribbon under 1 N pretension replaces pivots: 1.20 Hz, ±0.16 % orientation sensitivity (a cross-spring flexure pivot would be ~8 %), 154 MPa vs 350 MPa fatigue limit.
+1. **Constant-force spring-arm escapement** — train torque varies 24× across syringe sizes, rates and loads (19–476 µN·m); a conventional lever escapement over-banks, the spring-arm design holds amplitude constant with a period error of 0.06 %.
+2. **Taut-band balance** — a 38.1 µm (0.0015") × 2 mm feeler-gauge steel ribbon under 1 N pretension replaces pivots: 1.20 Hz, ±0.19 % orientation sensitivity (a cross-spring flexure pivot would be ~8 %), 166 MPa vs 350 MPa fatigue limit; a slotted clamp (L_h 18–26.5 mm) absorbs the ±2.5 µm stock tolerance.
 
-Predicted accuracy: 95 % of units within -1.13 … +1.14 % (requirement ±5 %); flow-restriction pumps: +45 % at 37 °C, −33 % at 100 mmHg back-pressure. BOM ≈ $38.
+Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %); flow-restriction pumps: +45 % at 37 °C, −33 % at 100 mmHg back-pressure. Escapement torque margin ≥ 2.0× over all 5 syringes × 4 cassettes × 0–300 mmHg. BOM ≈ $40.
+
+**Revision 2** (external review): drive spring 30 → 44.5 N (the 60 mL syringe stalled before its occlusion trip at 30 N), occlusion trip preload keyed to the syringe cradle insert (6.1–26.9 N) with a disclosed friction-dependent pressure band, ribbon modelled at the true 38.1 µm stock thickness with a 22 mm half-band, mesh count corrected to six. See `docs/ChronoFlow_Report.md` §Revision 2.
 
 ## Repository layout
 | Path | Contents |

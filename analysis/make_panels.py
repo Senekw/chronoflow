@@ -38,7 +38,7 @@ def mu_water(T_C):
 # ================================================================ FIG 1
 # b: block diagram of the energy / metering chain
 fig, ax = new("fig1", "b"); ax.axis("off"); ax.set_xlim(0, 10); ax.set_ylim(0, 10.6)
-boxes = [("constant-force\nspring, 30 N", 9.6, C_STEEL), ("carriage + pusher\n(plunger load 2–15 N)", 8.1, C_PRINT), ("rack → pinion\n+ winding ratchet", 6.6, C_PRINT),
+boxes = [(f"constant-force\nspring, {dp.F_SPRING:.1f} N", 9.6, C_STEEL), ("carriage + pusher\n(plunger load 1.5–27 N)", 8.1, C_PRINT), ("rack → pinion\n+ winding ratchet", 6.6, C_PRINT),
          ("step-up train\n5·5·5·2.5 = 312.5", 5.1, C_PRINT), ("rate cassette\n×1 · ×2 · ×5 · ×10", 3.6, "#e8a33d"), ("escape wheel 15 T +\nspring-arm escapement", 2.1, C_BRASS),
          ("taut-band balance\nf₀ = 1.20 Hz", 0.6, C_PRINT)]
 for txt, y, col in boxes:
@@ -47,12 +47,12 @@ for txt, y, col in boxes:
 for y in [b[1] for b in boxes[:-1]]:
     ax.add_patch(FancyArrowPatch((4.0, y-0.5), (4.0, y-1.0), arrowstyle="-|>", mutation_scale=7, lw=1.0, color="#333333"))
 # side annotations
-ax.text(7.2, 9.6, "F = const\n(2.85 J per wind)", fontsize=6, va="center", color="#444444")
-ax.text(7.2, 8.1, "excess force\n15–28 N", fontsize=6, va="center", color="#444444")
-ax.text(7.2, 6.6, "180 mN·m", fontsize=6, va="center", color="#444444")
+ax.text(7.2, 9.6, f"F = const\n({R['energy']['spring_energy_J']:.1f} J per wind)", fontsize=6, va="center", color="#444444")
+ax.text(7.2, 8.1, f"excess force\n{R['operating']['F_excess_min_N']:.0f}–{R['operating']['F_excess_max_N']:.0f} N", fontsize=6, va="center", color="#444444")
+ax.text(7.2, 6.6, f"{R['structure']['rack_pinion_torque_mNm']:.0f} mN·m", fontsize=6, va="center", color="#444444")
 ax.text(7.2, 5.1, "torque ÷ 312", fontsize=6, va="center", color="#444444")
 ax.text(7.2, 3.6, "sets rate", fontsize=6, va="center", color="#444444")
-ax.text(7.2, 2.1, "17–315 µN·m in,\nfixed 1.2 µJ out", fontsize=6, va="center", color="#444444")
+ax.text(7.2, 2.1, f"{R['operating']['torque_range_uNm'][0]:.0f}–{R['operating']['torque_range_uNm'][1]:.0f} µN·m in,\nfixed 1.2 µJ out", fontsize=6, va="center", color="#444444")
 ax.text(7.2, 0.6, "1 half-tooth / beat\n→ 4 µm, 1.16 µL", fontsize=6, va="center", color="#444444")
 ax.text(0.15, 5.1, "energy", rotation=90, va="center", fontsize=6.5, color=C_STEEL)
 ax.add_patch(FancyArrowPatch((0.6, 9.3), (0.6, 2.6), arrowstyle="-|>", mutation_scale=7, lw=1.0, color=C_STEEL))
@@ -166,7 +166,7 @@ ax.text(90, 1.25, "banked", fontsize=5.5, color=C_LEV)
 ax.text(2.2, 0.75, "lever", fontsize=6.5, color=C_LEV); ax.text(200, 0.42, "spring-arm", fontsize=6.5, color=C_ARM)
 ax.set_xscale("log"); ax.set_xticks([1, 10, 100]); ax.set_xticklabels(["1", "10", "100"])
 ax.set_xlabel("escape-wheel torque (µN·m)"); ax.set_ylabel("balance amplitude (rad)"); ax.set_ylim(-0.05, 1.8)
-ax.set_title("Amplitude flat over 18× torque", loc="left")
+ax.set_title(f"Amplitude flat over {R['operating']['torque_dynamic_range']:.0f}× torque", loc="left")
 fig.tight_layout(pad=0.3); save(fig, "fig2", "c")
 
 # d: period error vs torque
@@ -197,19 +197,19 @@ fig, ax = new("fig3", "a"); ax.axis("off"); ax.set_xlim(0, 10); ax.set_ylim(0, 1
 X = 6.3   # band axis
 ax.add_patch(Rectangle((5.2, 9.4), 3.8, 0.5, fc=C_STEEL, ec="none")); ax.text(9.1, 9.65, "deck", fontsize=5.5, va="center")
 ax.add_patch(Rectangle((3.6, 0.5), 5.4, 0.5, fc=C_STEEL, ec="none")); ax.text(9.1, 0.75, "base", fontsize=5.5, va="center")
-ax.add_patch(Rectangle((X-0.45, 8.75), 0.9, 0.65, fc="#6b7680", ec="none")); ax.text(X+0.6, 9.05, "fixed clamp", fontsize=5.5, va="center")
+ax.add_patch(Rectangle((X-0.45, 8.75), 0.9, 0.65, fc="#6b7680", ec="none")); ax.text(X+0.6, 9.05, "fixed clamp\n(slotted: L_h 18–26 mm)", fontsize=5.5, va="center")
 ax.plot([X, X], [8.75, 5.95], color="#333", lw=1.5); ax.plot([X, X], [4.05, 1.95], color="#333", lw=1.5)
-ax.text(X+0.25, 7.35, "L_h = 25 mm\nT = T₀ + m g", fontsize=5.5, va="center"); ax.text(X+0.25, 3.0, "L_h = 25 mm\nT = T₀", fontsize=5.5, va="center")
+ax.text(X+0.25, 7.35, f"L_h = {dp.BAND_LH*1e3:.0f} mm\nT = T₀ + m g", fontsize=5.5, va="center"); ax.text(X+0.25, 3.0, f"L_h = {dp.BAND_LH*1e3:.0f} mm\nT = T₀", fontsize=5.5, va="center")
 ax.add_patch(Rectangle((X-2.9, 4.05), 5.8, 1.9, fc="none", ec=C_PRINT, lw=1.8)); ax.add_patch(Rectangle((X-0.35, 4.05), 0.7, 1.9, fc=C_PRINT, ec="none"))
 for xx in (X-2.4, X+2.4): ax.add_patch(Circle((xx, 5.0), 0.22, fc=C_BRASS, ec="none"))
 ax.text(X-2.9, 6.25, "balance ring Ø62 mm, 7.4 g; M3 brass trim nuts ×4", fontsize=5.5, color=C_PRINT)
 ax.add_patch(Rectangle((X-0.45, 1.3), 0.9, 0.65, fc="#6b7680", ec="none")); ax.text(X+0.6, 1.6, "tension clamp", fontsize=5.5, va="center")
 ys = np.linspace(1.0, 1.3, 9); xs = X + 0.15*np.array([1,-1]*4+[1])
 ax.plot(xs, ys, color="#555", lw=0.9); ax.text(X-0.6, 1.1, "coil spring T₀ = 1 N", fontsize=5.5, ha="right", va="center")
-ax.text(0.1, 9.55, "ribbon 0.04 × 2 mm\nspring steel (feeler gauge)", fontsize=6, va="top")
+ax.text(0.1, 9.55, f"ribbon {dp.BAND_T*1e6:.1f} µm × 2 mm\n(0.0015\" feeler-gauge steel)", fontsize=6, va="top")
 ax.text(0.1, 8.15, "k_half = GJ/L_h + T w²/(12 L_h)", fontsize=6, va="top")
 ax.text(0.1, 7.45, f"k = {k*1e3:.2f} mN·m/rad\nf₀ = 1.20 Hz", fontsize=6, va="top")
-ax.text(0.1, 3.6, "no pivot, no lubricant;\ngravity only adds ±m g\nto one half-band\n→ ±0.16 % in f", fontsize=6, va="top")
+ax.text(0.1, 3.6, f"no pivot, no lubricant;\ngravity only adds ±m g\nto one half-band\n→ ±{R['oscillator']['orientation_max_pct']:.2f} % in f", fontsize=6, va="top")
 save(fig, "fig3", "a")
 # b: frequency vs trim radius
 rt = np.linspace(dp.R_TRIM_MIN, dp.R_TRIM_MAX, 200)
@@ -235,7 +235,7 @@ for i, (lab, v, col) in enumerate(vals):
     ax.plot([1e-3, v], [i, i], color=META_GREY, lw=0.8); ax.plot(v, i, "o", color=col, ms=5); ax.text(v*1.3, i, f"{v:.2g} %", va="center", fontsize=6)
 ax.set_yticks(range(3)); ax.set_yticklabels([v[0] for v in vals]); ax.invert_yaxis()
 ax.set_xscale("log"); ax.set_xlim(0.03, 40); ax.set_xticks([0.1, 1, 10]); ax.set_xticklabels(["0.1", "1", "10"])
-ax.set_xlabel("frequency change vs. device flat (%)"); ax.set_title("50× less orientation error", loc="left")
+ax.set_xlabel("frequency change vs. device flat (%)"); ax.set_title(f"{8.3/R['oscillator']['orientation_max_pct']:.0f}× less orientation error", loc="left")
 fig.tight_layout(pad=0.3); save(fig, "fig3", "c")
 
 # d: band stress vs amplitude
@@ -277,14 +277,16 @@ fig.tight_layout(pad=0.3); save(fig, "fig4", "a")
 fig, ax = new("fig4", "b")
 cas = list(dp.CASSETTES); x = np.arange(len(cas))
 Fmin, Fmax = opm.F_excess_N.min(), opm.F_excess_N.max()
-for j, (Fx, col, lab) in enumerate(((Fmin, "#9ecae1", f"at occlusion trip ({Fmin:.1f} N excess)"), (Fmax, C_ARM, f"free-running ({Fmax:.1f} N excess)"))):
-    d = opm[np.isclose(opm.F_excess_N, Fx)]
+for j, (sname, Pmm, col, lab) in enumerate((("BD 60 mL", 300.0, "#9ecae1", f"60 mL at 300 mmHg trip ({Fmin:.1f} N excess)"), ("BD 5 mL", 0.0, C_ARM, f"5 mL free-running ({Fmax:.1f} N excess)"))):
+    d = opm[(opm.syringe == sname) & (opm.pressure_mmHg == Pmm)].set_index("cassette").loc[cas]
     ax.bar(x + (j-0.5)*0.38, d.margin, width=0.36, color=col, label=lab)
+op1 = pd.read_csv("results/operating_map_rev1_30N.csv"); r1 = op1[(op1.syringe == "BD 60 mL") & (op1.pressure_mmHg == 300.0)].set_index("cassette").loc[cas]
+ax.plot(x - 0.19, r1.margin, "x", color=C_ALARM, ms=5, label="rev 1, 30 N spring (stalled)")
 ax.axhline(1, color=C_ALARM, lw=0.8); ax.text(-0.45, 0.78, "stall", color=C_ALARM, fontsize=6, ha="left", va="top")
-ax.set_yscale("log"); ax.set_yticks([1, 10]); ax.set_yticklabels(["1×", "10×"]); ax.set_ylim(0.5, 60)
+ax.set_yscale("log"); ax.set_yticks([0.3, 1, 10, 100]); ax.set_yticklabels(["0.3×", "1×", "10×", "100×"]); ax.set_ylim(0.25, 3000)
 ax.set_xticks(x); ax.set_xticklabels([c.replace(" mL/h", "") for c in cas]); ax.set_xlabel("cassette (mL/h)")
-ax.set_ylabel("torque / re-cock minimum"); ax.set_title("Margin ≥ 1.7× at every rate", loc="left")
-ax.legend(frameon=False, fontsize=5.5, loc="upper right"); fig.tight_layout(pad=0.3); save(fig, "fig4", "b")
+ax.set_ylabel("torque / re-cock minimum"); ax.set_title(f"Margin ≥ {R['operating']['worst_margin']:.1f}× in every cell", loc="left")
+ax.legend(frameon=False, fontsize=5.2, loc="upper left", handlelength=1.2, borderaxespad=0.1); fig.tight_layout(pad=0.3); save(fig, "fig4", "b")
 
 # c: resolution lollipop
 res = R["resolution_uL_per_beat"]
