@@ -11,7 +11,7 @@
 \usepackage{xcolor}
 \usepackage[numbers,sort&compress]{natbib}
 \captionsetup{font=small,labelfont=bf}
-\sisetup{per-mode=symbol,separate-uncertainty=true,range-phrase=--,range-units=single}
+\sisetup{per-mode=symbol,separate-uncertainty=true,range-phrase=--,range-units=single,retain-explicit-plus=true}
 \graphicspath{{figures/}}
 \newcommand{\ChronoFlow}{ChronoFlow}
 \newcommand{\dd}{\mathrm{d}}
@@ -43,7 +43,7 @@ which is \SI{4.0}{\micro\metre} (\SI{1.16}{\micro\litre} on a BD \SI{20}{\milli\
 
 \begin{figure}[t]
 \centering\includegraphics[width=\textwidth]{fig1.png}
-\caption{\textbf{A spring-driven, clockwork-governed syringe driver meters volume, so the delivered rate is independent of fluid temperature and back-pressure.} (a) Labelled render of the parametric CAD assembly with a BD \SI{20}{\milli\litre} syringe at \SI{85}{\percent} fill and the \SI{10}{\milli\litre\per\hour} cassette. (b) Energy and metering chain; the left arrow follows energy from the spring to the balance, the right arrow follows the rate constraint back from the balance to the plunger. (c) Steady-state flow error versus fluid temperature for a flow-restriction pump calibrated at \SI{20}{\celsius} (water viscosity from the Vogel equation) and for \ChronoFlow\ (oscillator temperature coefficient $-1.8\times10^{-4}\,\si{\per\kelvin}$). (d) Flow error versus downstream back-pressure; \ChronoFlow\ stops and flags at the \SI{300}{mmHg} trip point. Green band: \SI{\pm 5}{\percent} clinical tolerance.}
+\caption{\textbf{A spring-driven, clockwork-governed syringe driver meters volume, so the delivered rate is independent of fluid temperature and back-pressure.} (a) Labelled render of the parametric CAD assembly with a BD \SI{20}{\milli\litre} syringe at \SI{85}{\percent} fill and the \SI{10}{\milli\litre\per\hour} cassette. (b) Energy and metering chain; the left arrow follows energy from the spring to the balance, the right arrow follows the rate constraint back from the balance to the plunger. (c) Steady-state flow error versus fluid temperature for a flow-restriction pump calibrated at \SI{20}{\celsius} (water viscosity from the Vogel equation) and for \ChronoFlow\ (oscillator temperature coefficient $-1.8\times10^{-4}\,\mathrm{K}^{-1}$). (d) Flow error versus downstream back-pressure; \ChronoFlow\ stops and flags at the \SI{300}{mmHg} trip point. Green band: \SI{\pm 5}{\percent} clinical tolerance.}
 \label{fig:overview}
 \end{figure}
 
@@ -59,13 +59,13 @@ The spring-arm escapement (Fig.~\ref{fig:escapement}a) separates the two energy 
 \end{figure}
 
 \subsection{Taut-band balance}
-The oscillator (Fig.~\ref{fig:oscillator}a) is a printed PETG ring (\SI{62}{\milli\metre} outer diameter, \SI{7.4}{\gram}, $I = \SI{5.2e-6}{\kilo\gram\metre\squared}$) clamped at the midpoint of a \SI{0.04 x 2}{\milli\metre} spring-steel ribbon cut from a \SI{0.0015}{in} feeler-gauge blade, held at both ends and pre-tensioned to $T_0 = \SI{1}{\newton}$ by a steel coil spring. Each \SI{25}{\milli\metre} half-band is a torsion spring of stiffness
+The oscillator (Fig.~\ref{fig:oscillator}a) is a printed PETG ring (\SI{62}{\milli\metre} outer diameter, \SI{7.4}{\gram}, $I = \SI{5.2e-6}{\kilo\gram\metre\squared}$) clamped at the midpoint of a \qtyproduct{0.04 x 2}{\milli\metre} spring-steel ribbon cut from a \SI{0.0015}{in} feeler-gauge blade, held at both ends and pre-tensioned to $T_0 = \SI{1}{\newton}$ by a steel coil spring. Each \SI{25}{\milli\metre} half-band is a torsion spring of stiffness
 \begin{equation}
 k_{\mathrm{half}} = \frac{G J}{L_h} + \frac{T\,w^2}{12\,L_h}, \qquad J = \tfrac{1}{3} w t^3 \left(1 - 0.63\,\tfrac{t}{w}\right),
 \end{equation}
 giving $k = \SI{2.96e-4}{\newton\metre\per\radian}$ and $f_0 = \SI{1.20}{\hertz}$. Four M3 brass nuts in radial slots (23--\SI{29}{\milli\metre}) regulate the frequency by $-2.2$ to \SI{+3.2}{\percent} (Fig.~\ref{fig:oscillator}b), exactly as a clock is regulated; the nominal set point is \SI{26.6}{\milli\metre}.
 
-Gravity enters only through the tension term: with the band vertical, the fixed-clamp half-band carries $T_0 \pm m g$ while the tensioner fixes the other at $T_0$. Because the tension term is \SI{9}{\percent} of $k$ and $mg \ll T_0$, the frequency shifts by only \SI{\pm 0.16}{\percent} between the upright and inverted positions (Fig.~\ref{fig:oscillator}c). An alternative two-leaf cross-spring flexure pivot, analysed with an Euler--Bernoulli beam-column finite-element model including geometric stiffness, changed rotational stiffness by \SI{17}{\percent} under the same balance weight (the governing scale is $EI/L^2 \approx \SI{0.1}{\newton}$, not the Euler load) and was rejected. Peak shear stress at the \SI{1.2}{\radian} banking limit is \SI{154}{\mega\pascal} against a conservative fully-reversed fatigue limit of \SI{350}{\mega\pascal} (Fig.~\ref{fig:oscillator}d), and the temperature coefficient, combining the shear-modulus drift of steel with the thermal expansion of the ring, is $-1.8\times10^{-4}\,\si{\per\kelvin}$ (Fig.~\ref{fig:oscillator}e).
+Gravity enters only through the tension term: with the band vertical, the fixed-clamp half-band carries $T_0 \pm m g$ while the tensioner fixes the other at $T_0$. Because the tension term is \SI{9}{\percent} of $k$ and $mg \ll T_0$, the frequency shifts by only \SI{\pm 0.16}{\percent} between the upright and inverted positions (Fig.~\ref{fig:oscillator}c). An alternative two-leaf cross-spring flexure pivot, analysed with an Euler--Bernoulli beam-column finite-element model including geometric stiffness, changed rotational stiffness by \SI{17}{\percent} under the same balance weight (the governing scale is $EI/L^2 \approx \SI{0.1}{\newton}$, not the Euler load) and was rejected. Peak shear stress at the \SI{1.2}{\radian} banking limit is \SI{154}{\mega\pascal} against a conservative fully-reversed fatigue limit of \SI{350}{\mega\pascal} (Fig.~\ref{fig:oscillator}d), and the temperature coefficient, combining the shear-modulus drift of steel with the thermal expansion of the ring, is $-1.8\times10^{-4}\,\mathrm{K}^{-1}$ (Fig.~\ref{fig:oscillator}e).
 
 \begin{figure}[t]
 \centering\includegraphics[width=\textwidth]{fig3.png}
