@@ -35,11 +35,22 @@ def trip_force(syringe, p_mmHg=300.0):
     """Trip preload for a syringe: p x area + nominal running friction."""
     s = SYRINGES[syringe]
     return p_mmHg * 133.322 * s["area_mm2"] * 1e-6 + s["friction"]
+def trip_preload(syringe, p_mmHg=300.0):
+    """Spacer preload: the sear releases after TRIP_SENSE_TRAVEL, by which time the spring force has risen k*ds,
+    so the preload is set k*ds BELOW the intended trip force (rev 3: the rise during sensing travel is included)."""
+    return trip_force(syringe, p_mmHg) - TRIP_SPRING_RATE * TRIP_SENSE_TRAVEL
+def stored_displacement_mL(syringe):
+    """Pusher travel stored in the trip spring at the sear-release point, as syringe volume (upper bound on a mechanical
+    release bolus if the stem were NOT captured; the sear captures the stem, so the design value is zero)."""
+    return SYRINGES[syringe]["area_mm2"] * TRIP_SENSE_TRAVEL / 1000.0
 def trip_pressure_range(syringe, F_set=None):
     """Pressure at which a force trip set to F_set actually fires, for friction +/- FRICTION_UNCERTAINTY (mmHg, low/nominal/high)."""
     s = SYRINGES[syringe]; F_set = trip_force(syringe) if F_set is None else F_set
     return tuple((F_set - (s["friction"] + df)) / (s["area_mm2"] * 1e-6) / 133.322 for df in (FRICTION_UNCERTAINTY, 0.0, -FRICTION_UNCERTAINTY))
-TRIP_TRAVEL = 3.0          # mm stem retraction that flags and stops the oscillator
+TRIP_SENSE_TRAVEL = 0.3    # mm stem retraction at which the sear releases (rev 3; was 3.0 mm of direct stem travel)
+TRIP_TRAVEL = TRIP_SENSE_TRAVEL
+FLAG_TRAVEL = 12.0         # mm travel of the spring-loaded flag rod released by the sear (raises flag + balance-blocking rail)
+FLAG_SPRING_N = 2.0        # N flag-rod spring (energy stored when the LOAD/RUN lever re-cocks it)
 SPRING_DRUM_D = 25.0       # mm drum diameter
 TRAVEL = 95.0              # mm carriage travel (covers 20 mL BD stroke 69.6 mm + loading margin)
 
@@ -90,7 +101,8 @@ BAND_T = 38.1e-6           # m, feeler-gauge spring steel ribbon thickness: 0.00
 BAND_T_TOL = 2.5e-6        # m, +/- thickness tolerance of feeler stock (drives the coarse length adjustment below)
 BAND_W = 2.0e-3            # m, ribbon width (cut from a 12.7 mm blade)
 BAND_LH = 22.0e-3          # m, free length of each half-band (clamp to balance hub); rev 2: 25 -> 22 mm for the 38.1 um ribbon
-BAND_LH_MIN, BAND_LH_MAX = 18.0e-3, 26.5e-3   # m, coarse adjustment of the fixed clamp (slotted post) to absorb +/-2.5 um stock thickness
+BAND_LH_MIN, BAND_LH_MAX = 18.0e-3, 26.5e-3   # m, coarse adjustment range of BOTH end clamps (slotted posts), moved symmetrically so the
+                                              #    hub stays centred; one-sided adjustment over this range would cover only 36.6-39.4 um
 BAND_T0 = 1.0              # N, pretension from a steel coil spring tensioner
 BAL_R_OUT = 31.0e-3        # m, balance ring outer radius
 BAL_R_IN = 27.0e-3         # m

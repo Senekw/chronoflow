@@ -6,7 +6,8 @@ item,qty,unit_usd,ext_usd
 Steel pins 3 mm x 50 mm (gear shafts),8,0.3,2.4
 "Steel pins 1 mm (impulse pin, pallets, latches)",4,0.1,0.4
 Brass M3 hex nuts (trim weights),4,0.08,0.32
-"Compression spring, occlusion trip 3 N/mm + 5 keyed preload spacers (6-27 N)",1,0.9,0.9
+"Compression spring, occlusion trip 3 N/mm + 5 keyed preload spacers (5-26 N)",1,0.9,0.9
+Flag-rod spring 2 N + steel sear pin (snap-action trip),1,0.4,0.4
 "M3 hardware (screws, heat-set inserts)",20,0.08,1.6
 Linear rods 6 mm x 200 mm (carriage rails),2,1.8,3.6
 "Rate cassettes (printed gear sets), 4",4,1.2,4.8

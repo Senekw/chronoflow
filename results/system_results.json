@@ -23,7 +23,27 @@
   "shear_stress_at_theta_max_MPa": 166.25454545454548,
   "fatigue_limit_MPa": 350.0,
   "tempco_per_K": -0.00017665683119353804,
-  "band_sag_mm": 0.400788223309121
+  "band_sag_mm": 0.400788223309121,
+  "band_adjustment": {
+   "t_min": {
+    "t_um": 35.6,
+    "L_symmetric_mm": 18.376054039804988,
+    "L_one_sided_mm": 15.77716365402728
+   },
+   "t_max": {
+    "t_um": 40.599999999999994,
+    "L_symmetric_mm": 26.127742700534444,
+    "L_one_sided_mm": 32.162156675571666
+   },
+   "one_sided_coverage_um": [
+    36.622900247799365,
+    39.375644307557245
+   ],
+   "sensitivity_pct_per_mm": {
+    "symmetric": -2.1980706156348506,
+    "one_sided": -1.0929289906319584
+   }
+  }
  },
  "escapement": {
   "T_min_arm_Nm": 9.549296585513721e-06,
@@ -130,8 +150,12 @@
  "occlusion": {
   "per_syringe": {
    "BD 5 mL": {
-    "trip_setting_N": 6.0688570668530435,
-    "preload_mm": 2.022952355617681,
+    "trip_force_N": 6.0688570668530435,
+    "spacer_preload_N": 5.168857066853043,
+    "spacer_preload_mm": 1.7229523556176811,
+    "sense_travel_force_rise_N": 0.8999999999999999,
+    "sense_rise_mmHg_if_uncompensated": 59.095742337584596,
+    "full_3mm_rise_mmHg": 590.957423375846,
     "pressure_band_mmHg": [
      201.5070961040257,
      300.0,
@@ -141,11 +165,16 @@
      -32.83096796532477,
      32.83096796532479
     ],
-    "force_after_3mm_trip_travel_N": 15.068857066853043
+    "stored_displacement_at_sear_mL": 0.03426934089537393,
+    "stored_displacement_3mm_mL": 0.34269340895373934
    },
    "BD 10 mL": {
-    "trip_setting_N": 8.604637112295435,
-    "preload_mm": 2.868212370765145,
+    "trip_force_N": 8.604637112295435,
+    "spacer_preload_N": 7.704637112295435,
+    "spacer_preload_mm": 2.568212370765145,
+    "sense_travel_force_rise_N": 0.8999999999999999,
+    "sense_rise_mmHg_if_uncompensated": 40.88036865755396,
+    "full_3mm_rise_mmHg": 408.8036865755396,
     "pressure_band_mmHg": [
      231.8660522374101,
      300.0,
@@ -155,11 +184,16 @@
      -22.711315920863306,
      22.711315920863306
     ],
-    "force_after_3mm_trip_travel_N": 17.604637112295435
+    "stored_displacement_at_sear_mL": 0.04953898915629405,
+    "stored_displacement_3mm_mL": 0.49538989156294055
    },
    "BD 20 mL": {
-    "trip_setting_N": 14.495897851322658,
-    "preload_mm": 4.831965950440886,
+    "trip_force_N": 14.495897851322658,
+    "spacer_preload_N": 13.595897851322658,
+    "spacer_preload_mm": 4.531965950440886,
+    "sense_travel_force_rise_N": 0.8999999999999999,
+    "sense_rise_mmHg_if_uncompensated": 23.48663875513953,
+    "full_3mm_rise_mmHg": 234.86638755139532,
     "pressure_band_mmHg": [
      260.8556020747675,
      300.0,
@@ -169,11 +203,16 @@
      -13.04813264174417,
      13.048132641744182
     ],
-    "force_after_3mm_trip_travel_N": 23.49589785132266
+    "stored_displacement_at_sear_mL": 0.08622656314278707,
+    "stored_displacement_3mm_mL": 0.8622656314278708
    },
    "BD 30 mL": {
-    "trip_setting_N": 18.292188203609022,
-    "preload_mm": 6.097396067869674,
+    "trip_force_N": 18.292188203609022,
+    "spacer_preload_N": 17.392188203609024,
+    "spacer_preload_mm": 5.797396067869674,
+    "sense_travel_force_rise_N": 0.8999999999999999,
+    "sense_rise_mmHg_if_uncompensated": 18.252877551552842,
+    "full_3mm_rise_mmHg": 182.52877551552848,
     "pressure_band_mmHg": [
      269.57853741407854,
      300.0,
@@ -183,11 +222,16 @@
      -10.140487528640485,
      10.140487528640474
     ],
-    "force_after_3mm_trip_travel_N": 27.292188203609022
+    "stored_displacement_at_sear_mL": 0.11095084234866733,
+    "stored_displacement_3mm_mL": 1.109508423486673
    },
    "BD 60 mL": {
-    "trip_setting_N": 26.89419619968748,
-    "preload_mm": 8.964732066562494,
+    "trip_force_N": 26.89419619968748,
+    "spacer_preload_N": 25.994196199687483,
+    "spacer_preload_mm": 8.664732066562495,
+    "sense_travel_force_rise_N": 0.8999999999999999,
+    "sense_rise_mmHg_if_uncompensated": 12.056695296961271,
+    "full_3mm_rise_mmHg": 120.56695296961271,
     "pressure_band_mmHg": [
      279.9055078383979,
      300.00000000000006,
@@ -197,13 +241,16 @@
      -6.698164053867384,
      6.6981640538673615
     ],
-    "force_after_3mm_trip_travel_N": 35.894196199687485
+    "stored_displacement_at_sear_mL": 0.16797074901132206,
+    "stored_displacement_3mm_mL": 1.6797074901132205
    }
   },
   "spring_rate_N_per_mm": 3.0,
+  "sense_travel_mm": 0.3,
+  "flag_travel_mm": 12.0,
   "preload_range_N": [
-   6.0,
-   27.0
+   5.168857066853043,
+   25.994196199687483
   ],
   "friction_uncertainty_N": 1.5
  },
@@ -213,5 +260,5 @@
   "2 mL/h": 0.23115838917433718,
   "1 mL/h": 0.11557919458716859
  },
- "bom_total_usd": 39.919999999999995
+ "bom_total_usd": 40.31999999999999
 }

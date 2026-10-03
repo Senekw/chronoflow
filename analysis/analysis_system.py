@@ -144,13 +144,29 @@ R["energy"] = dict(spring_energy_J=E_spring, escapement_power_uW=P_esc*1e6,
                    runtime_h_20mL={c: 20/dp.flow_mL_h(dp.F_TARGET, dp.cassette_ratio(z)) for c, z in dp.CASSETTES.items()})
 occ = {}
 for sname, s in dp.SYRINGES.items():
-    F_set = dp.trip_force(sname)
+    F_set = dp.trip_force(sname); F_pre = dp.trip_preload(sname)
     lo, nom, hi = dp.trip_pressure_range(sname)
-    occ[sname] = dict(trip_setting_N=F_set, preload_mm=F_set/dp.TRIP_SPRING_RATE,
+    A = s["area_mm2"]
+    occ[sname] = dict(trip_force_N=F_set, spacer_preload_N=F_pre, spacer_preload_mm=F_pre/dp.TRIP_SPRING_RATE,
+                      sense_travel_force_rise_N=dp.TRIP_SPRING_RATE*dp.TRIP_SENSE_TRAVEL,
+                      sense_rise_mmHg_if_uncompensated=dp.TRIP_SPRING_RATE*dp.TRIP_SENSE_TRAVEL/(A*1e-6)/133.322,
+                      full_3mm_rise_mmHg=dp.TRIP_SPRING_RATE*3.0/(A*1e-6)/133.322,
                       pressure_band_mmHg=[lo, nom, hi], pressure_band_pct=[(lo/nom-1)*100, (hi/nom-1)*100],
-                      force_after_3mm_trip_travel_N=F_set + dp.TRIP_SPRING_RATE*dp.TRIP_TRAVEL)
-R["occlusion"] = dict(per_syringe=occ, spring_rate_N_per_mm=dp.TRIP_SPRING_RATE, preload_range_N=list(dp.TRIP_RANGE),
+                      stored_displacement_at_sear_mL=dp.stored_displacement_mL(sname), stored_displacement_3mm_mL=A*3.0/1000.0)
+R["occlusion"] = dict(per_syringe=occ, spring_rate_N_per_mm=dp.TRIP_SPRING_RATE, sense_travel_mm=dp.TRIP_SENSE_TRAVEL, flag_travel_mm=dp.FLAG_TRAVEL,
+                      preload_range_N=[min(v["spacer_preload_N"] for v in occ.values()), max(v["spacer_preload_N"] for v in occ.values())],
                       friction_uncertainty_N=dp.FRICTION_UNCERTAINTY)
+# band adjustment: symmetric vs one-sided coverage of ribbon thickness tolerance
+from scipy.optimize import brentq as _brentq
+def _f_lr(Lu, Ll, t): return ao.frequency(ao.k_half(dp.BAND_W, t, Lu, dp.BAND_T0) + ao.k_half(dp.BAND_W, t, Ll, dp.BAND_T0), I_bal)
+_f0 = _f_lr(dp.BAND_LH, dp.BAND_LH, dp.BAND_T)
+band_adj = {}
+for tag, t in (("t_min", dp.BAND_T - dp.BAND_T_TOL), ("t_max", dp.BAND_T + dp.BAND_T_TOL)):
+    band_adj[tag] = dict(t_um=t*1e6, L_symmetric_mm=_brentq(lambda L: _f_lr(L, L, t) - _f0, 5e-3, 80e-3)*1e3,
+                         L_one_sided_mm=_brentq(lambda L: _f_lr(L, dp.BAND_LH, t) - _f0, 5e-3, 80e-3)*1e3)
+band_adj["one_sided_coverage_um"] = [_brentq(lambda t: _f_lr(L, dp.BAND_LH, t) - _f0, 20e-6, 60e-6)*1e6 for L in (dp.BAND_LH_MIN, dp.BAND_LH_MAX)]
+band_adj["sensitivity_pct_per_mm"] = dict(symmetric=(_f_lr(dp.BAND_LH+1e-3, dp.BAND_LH+1e-3, dp.BAND_T)/_f0-1)*100, one_sided=(_f_lr(dp.BAND_LH+1e-3, dp.BAND_LH, dp.BAND_T)/_f0-1)*100)
+R["oscillator"]["band_adjustment"] = band_adj
 R["resolution_uL_per_beat"] = {c: float(flow_tab[(flow_tab.cassette == c) & (flow_tab.syringe == dp.DESIGN_SYRINGE)].uL_per_beat.iloc[0]) for c in dp.CASSETTES}
 
 # ---------------------------------------------------------------- BOM (indicative unit prices, USD, small quantities)
@@ -162,7 +178,8 @@ bom = [
  ("Steel pins 3 mm x 50 mm (gear shafts)", 8, 0.30),
  ("Steel pins 1 mm (impulse pin, pallets, latches)", 4, 0.10),
  ("Brass M3 hex nuts (trim weights)", 4, 0.08),
- ("Compression spring, occlusion trip 3 N/mm + 5 keyed preload spacers (6-27 N)", 1, 0.90),
+ ("Compression spring, occlusion trip 3 N/mm + 5 keyed preload spacers (5-26 N)", 1, 0.90),
+ ("Flag-rod spring 2 N + steel sear pin (snap-action trip)", 1, 0.40),
  ("M3 hardware (screws, heat-set inserts)", 20, 0.08),
  ("Linear rods 6 mm x 200 mm (carriage rails)", 2, 1.80),
  ("Rate cassettes (printed gear sets), 4", 4, 1.20),

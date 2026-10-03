@@ -15,7 +15,7 @@ Two design results carry the project:
 
 Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %); flow-restriction pumps: +45 % at 37 °C, −33 % at 100 mmHg back-pressure. Escapement torque margin ≥ 2.0× over all 5 syringes × 4 cassettes × 0–300 mmHg. BOM ≈ $40.
 
-**Revision 2** (external review): drive spring 30 → 44.5 N (the 60 mL syringe stalled before its occlusion trip at 30 N), occlusion trip preload keyed to the syringe cradle insert (6.1–26.9 N) with a disclosed friction-dependent pressure band, ribbon modelled at the true 38.1 µm stock thickness with a 22 mm half-band, mesh count corrected (rack mesh at 0.95 plus six printed gear meshes at 0.92, not seven at 0.92). See `docs/ChronoFlow_Report.md` §Revision 2.
+**Revision 2** (external review): drive spring 30 → 44.5 N (the 60 mL syringe stalled before its occlusion trip at 30 N), snap-action occlusion trip (0.3 mm sensing travel to a sear, stem captured, 12 mm sprung flag rod) with spacer preload keyed to the syringe cradle insert and a disclosed friction-dependent pressure band, both band clamps slotted for symmetric coarse regulation, ribbon modelled at the true 38.1 µm stock thickness with a 22 mm half-band, mesh count corrected (rack mesh at 0.95 plus six printed gear meshes at 0.92, not seven at 0.92). See `docs/ChronoFlow_Report.md` §Revision 2.
 
 ## Repository layout
 | Path | Contents |
