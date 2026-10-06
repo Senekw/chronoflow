@@ -315,6 +315,15 @@
   ]
  },
  {
+  "name": "trip reset ramp",
+  "file": "cad_out/stl/trip_reset_ramp.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
   "name": "spring drum",
   "file": "cad_out/stl/spring_drum.stl",
   "color": [
@@ -594,21 +603,21 @@
   ]
  },
  {
-  "name": "impulse arm A flexure",
-  "file": "cad_out/stl/impulse_arm_A_flexure.stl",
+  "name": "impulse arm A torsion spring",
+  "file": "cad_out/stl/impulse_arm_A_torsion_spring.stl",
   "color": [
-   0.9098039711980526,
-   0.6392157612672941,
-   0.23921567912927097
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
   ]
  },
  {
   "name": "impulse arm A post",
   "file": "cad_out/stl/impulse_arm_A_post.stl",
   "color": [
-   0.9098039711980526,
-   0.6392157612672941,
-   0.23921567912927097
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
   ]
  },
  {
@@ -639,21 +648,21 @@
   ]
  },
  {
-  "name": "impulse arm B flexure",
-  "file": "cad_out/stl/impulse_arm_B_flexure.stl",
+  "name": "impulse arm B torsion spring",
+  "file": "cad_out/stl/impulse_arm_B_torsion_spring.stl",
   "color": [
-   0.9098039711980526,
-   0.6392157612672941,
-   0.23921567912927097
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
   ]
  },
  {
   "name": "impulse arm B post",
   "file": "cad_out/stl/impulse_arm_B_post.stl",
   "color": [
-   0.9098039711980526,
-   0.6392157612672941,
-   0.23921567912927097
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
   ]
  },
  {
@@ -704,6 +713,33 @@
  {
   "name": "wheel detent post",
   "file": "cad_out/stl/wheel_detent_post.stl",
+  "color": [
+   0.7215686578280376,
+   0.7372549907808794,
+   0.7607843920382316
+  ]
+ },
+ {
+  "name": "release star",
+  "file": "cad_out/stl/release_star.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "release star pegs",
+  "file": "cad_out/stl/release_star_pegs.stl",
+  "color": [
+   0.9098039711980526,
+   0.6392157612672941,
+   0.23921567912927097
+  ]
+ },
+ {
+  "name": "release star axle",
+  "file": "cad_out/stl/release_star_axle.stl",
   "color": [
    0.9098039711980526,
    0.6392157612672941,

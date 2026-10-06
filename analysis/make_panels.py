@@ -135,10 +135,10 @@ def draw_phase(x0, phase):
         ax.add_patch(FancyArrowPatch((ex-0.3, ey-0.2), (ex+0.25, ey-0.55), arrowstyle="-|>", mutation_scale=7, lw=1.2, color=C_ALARM))
     if phase == "cock":
         ax.add_patch(FancyArrowPatch((cx+0.3, cy-1.4), (cx-0.5, cy-1.3), connectionstyle="arc3,rad=0.4", arrowstyle="-|>", mutation_scale=6, lw=0.9, color="#7a6230"))
-for i, (ph, t1, t2) in enumerate((("cock", "1  cock", "tooth lifts arm,\nflexure stores E"), ("latch", "2  hold", "latch holds arm;\nexcess torque idle"), ("release", "3  release", "pin trips latch;\nfixed 1.2 µJ impulse"))):
+for i, (ph, t1, t2) in enumerate((("cock", "1  cock", "tooth lifts arm,\nspring stores E"), ("latch", "2  hold", "latch holds arm;\nexcess torque idle"), ("release", "3  release", "pin trips latch;\nfixed 1.2 µJ impulse"))):
     draw_phase(4.0*i, ph)
     ax.text(4.0*i + 0.7, 7.3, t1, fontsize=7, va="top", fontweight="bold"); ax.text(4.0*i + 0.1, 6.75, t2, fontsize=5.8, va="top", color="#333")
-ax.text(0.1, 0.3, "escape wheel", fontsize=5.5, color="#7a6230"); ax.text(2.6, 0.3, "arm · flexure · latch", fontsize=5.5, color="#9a6a1a"); ax.text(6.4, 0.3, "balance hub + impulse pin", fontsize=5.5, color=C_PRINT)
+ax.text(0.1, 0.3, "escape wheel", fontsize=5.5, color="#7a6230"); ax.text(2.6, 0.3, "arm · spring · latch", fontsize=5.5, color="#9a6a1a"); ax.text(6.4, 0.3, "balance hub + impulse pin", fontsize=5.5, color=C_PRINT)
 save(fig, "fig2", "a")
 
 # b: time traces

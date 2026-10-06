@@ -41,34 +41,66 @@ S_IMP = R_PIN * TH_IMP                                   # tip travel during imp
 DTH_ARM = S_IMP / R_T                                    # arm rotation during impulse (27.5 mrad)
 PHI_COCK = 0.10                                          # rad of wheel rotation over which the tooth back-slope re-cocks the arm
 PHI_FREE = HALF_PITCH - PHI_COCK                         # free-running arc before the tooth reaches the pallet
-F_BEAT = 2 * dp.F_TARGET                                 # beats per second (two arms alternate -> each arm has one period to re-cock)
+F_BEAT = 2 * dp.F_TARGET                                 # beats per second
 PERIOD = 1.0 / dp.F_TARGET
 T_IMPULSE = TH_IMP / (2 * math.pi * dp.F_TARGET * 0.6)   # ~ time the pin spends in the impulse arc at amplitude 0.6 rad (order of magnitude)
-BUDGET = PERIOD - T_IMPULSE
+# rev 5: the two arms alternate, so each ARM has a full period to be re-cocked, but the single escape WHEEL must run its
+# half pitch (re-cock + lock) between successive beats, i.e. within half a period minus the impulse time.  Event timeline per
+# beat: unlatch -> impulse (T_IMPULSE) -> arm end-of-stroke releases the detent -> wheel free arc -> cocking arc -> lock.
+BUDGET = PERIOD / 2 - T_IMPULSE
+BUDGET_FULL_PERIOD = PERIOD - T_IMPULSE                  # the (incorrect) rev-4 budget, kept for the record
 
-# ------------------------------------------------------------------ 1. impulse energy from the preloaded arm
-E_imp = dp.E_IMPULSE
-F_tip = E_imp / S_IMP                                    # mean tip force on the impulse pin
-TAU_ARM = F_tip * R_T                                    # arm torque (nearly constant over the small cycle)
-F_PALLET = TAU_ARM / R_P                                 # force the wheel tooth must overcome at the pallet
-K_F_OPTIONS = {                                          # arm preload spring stiffness options, N m / rad
-    "PETG flexure 0.8x2.5x14 mm at 8 mm": 3 * 2.0e9 * (2.5e-3 * 0.8e-3**3 / 12) / (14e-3)**3 * (8e-3)**2,
-    "PETG flexure 1.2x2.5x14 mm at 8 mm": 3 * 2.0e9 * (2.5e-3 * 1.2e-3**3 / 12) / (14e-3)**3 * (8e-3)**2,
-    "music-wire torsion spring (design)": 1.0e-4,
-}
-K_F = K_F_OPTIONS["music-wire torsion spring (design)"]
-TH_PRE = TAU_ARM / K_F                                   # preload angle
-droop = DTH_ARM / TH_PRE                                 # fractional force droop over the impulse arc
-LATCH_TOL = 0.1e-3                                       # m, printed latch position tolerance (fixed per build)
-LATCH_SCATTER = 5e-6                                     # m, beat-to-beat release-point scatter (surface finish)
-res["impulse"] = dict(E_impulse_J=E_imp, tip_travel_mm=S_IMP*1e3, arm_rotation_mrad=DTH_ARM*1e3, tip_force_mN=F_tip*1e3,
-                      arm_torque_Nm=TAU_ARM, pallet_force_mN=F_PALLET*1e3,
-                      preload_stiffness_options_Nm_per_rad={k: v for k, v in K_F_OPTIONS.items()},
-                      preload_angle_rad={k: TAU_ARM / v for k, v in K_F_OPTIONS.items()},
-                      design_k_Nm_per_rad=K_F, design_preload_angle_deg=math.degrees(TH_PRE),
-                      force_droop_over_impulse_pct=100*droop,
-                      energy_bias_from_latch_tolerance_pct=100 * (LATCH_TOL / R_LATCH) / TH_PRE,
-                      beat_to_beat_energy_scatter_pct=100 * (LATCH_SCATTER / R_LATCH) / TH_PRE)
+# ------------------------------------------------------------------ 1. impulse energy: FORWARD model from a specified spring
+# rev 5 (review round 6): the energy is no longer taken from design_params.E_IMPULSE; it is the work a specified torsion
+# spring (k, preload) does on the impulse pin as the arm follows the pin over the impulse arc, integrated through the
+# contact geometry (tip on a pin that moves on a circle of radius R_PIN about the balance axis), minus tip friction.
+K_F = 1.0e-4               # N m / rad, music-wire torsion spring on the arm pivot (specified)
+TH_PRE = math.radians(26.3)  # rad, preload angle at the start of the impulse (set by the latch position); chosen so the forward model gives 1.2 uJ
+MU_TIP = 0.15              # steel tip on steel pin, lightly oiled
+def impulse_energy(k=K_F, th_pre=TH_PRE, mu=MU_TIP, n=400):
+    """Work delivered to the balance over the impulse arc (balance angle -ARM_RELEASE .. -ARM_RELEASE+ARM_IMPULSE).
+    The arm axis passes through the balance centre, so the tip pushes the pin along the pin's tangent at the centre
+    crossing; off-centre the tip force makes angle phi with the pin's tangent (cos phi work factor) and the sliding
+    component mu*N*sin(phi) is lost.  Arm rotation d(theta) = R_PIN cos(phi) d(phi) / R_T."""
+    phi0 = -math.radians(dp.ARM_RELEASE_DEG); phi1 = phi0 + TH_IMP
+    phis = np.linspace(phi0, phi1, n + 1)
+    th = 0.0; E = 0.0
+    for a, b in zip(phis[:-1], phis[1:]):
+        dphi = b - a; phim = 0.5 * (a + b)
+        dth = R_PIN * math.cos(phim) * dphi / R_T                      # arm rotation for this pin step
+        tau = k * (th_pre - th)                                        # arm torque at the current unwinding
+        F_tip = tau / R_T                                              # force at the tip, normal to the arm
+        dE = F_tip * math.cos(phim) * (R_PIN * dphi) - mu * F_tip * abs(math.sin(phim)) * (R_PIN * dphi)
+        E += dE; th += dth
+    return E, th
+E_imp, DTH_ARM_FWD = impulse_energy()
+res["impulse"] = dict(spring_k_Nm_per_rad=K_F, preload_deg=math.degrees(TH_PRE), mu_tip=MU_TIP,
+                      E_impulse_forward_J=E_imp, E_impulse_assumed_in_beat_model_J=dp.E_IMPULSE,
+                      arm_rotation_mrad=DTH_ARM_FWD*1e3, tip_travel_mm=S_IMP*1e3,
+                      E_vs_preload={f"{d:+d} deg": impulse_energy(th_pre=TH_PRE + math.radians(d))[0] for d in (-3, -2, -1, 0, 1, 2, 3)},
+                      E_vs_mu={f"{m:.2f}": impulse_energy(mu=m)[0] for m in (0.0, 0.1, 0.15, 0.2, 0.3)},
+                      force_droop_over_impulse_pct=100 * DTH_ARM_FWD / TH_PRE)
+# derived quantities used downstream
+TAU_ARM = K_F * (TH_PRE - DTH_ARM_FWD / 2)                             # mean arm torque over the stroke
+DTH_ARM = DTH_ARM_FWD
+F_tip = TAU_ARM / R_T; F_PALLET = TAU_ARM / R_P
+LATCH_TOL = 0.1e-3; LATCH_SCATTER = 5e-6
+res["impulse"].update(dict(mean_arm_torque_Nm=TAU_ARM, tip_force_mN=F_tip*1e3, pallet_force_mN=F_PALLET*1e3,
+                           energy_bias_from_latch_tolerance_pct=100 * (LATCH_TOL / R_LATCH) / TH_PRE,
+                           beat_to_beat_energy_scatter_pct=100 * (LATCH_SCATTER / R_LATCH) / TH_PRE))
+# ---- why not the printed flexure: k = 3EI/L^3 * r^2 for the 0.8 x 2.5 x 14 mm PETG cantilever acting at 8 mm
+K_FLEX = 3 * 2.0e9 * (2.5e-3 * 0.8e-3**3 / 12) / (14e-3)**3 * (8e-3)**2       # = 0.0149 N m/rad (150x stiffer than K_F)
+# minimum preload that keeps the force positive to the end of the stroke is th_pre = DTH_ARM (100 % droop); the energy
+# it then delivers is k*DTH^2/2; to deliver the design 1.2 uJ with positive force the required preload is below DTH -> impossible
+E_flex_min_pos = 0.5 * K_FLEX * DTH_ARM**2
+th_pre_flex_for_target = dp.E_IMPULSE / (K_FLEX * DTH_ARM) + DTH_ARM / 2
+res["impulse"]["printed_flexure"] = dict(k_Nm_per_rad=K_FLEX, stiffness_ratio_vs_design=K_FLEX / K_F,
+    preload_for_1p2uJ_rad=th_pre_flex_for_target, arm_stroke_rad=DTH_ARM,
+    feasible_with_positive_force=bool(th_pre_flex_for_target >= DTH_ARM),
+    energy_at_100pct_droop_uJ=E_flex_min_pos*1e6,
+    note="the flexure is 150x too STIFF, not too soft: at the design energy its force would pass through zero before the "
+         "end of the 27 mrad stroke (preload 16.7 mrad < stroke); a soft wire spring with a large preload is needed "
+         "for a near-constant force (rev 4 text had the preload angle 1000x wrong)")
 
 # ------------------------------------------------------------------ 2. unlatch work
 N_LATCH = TAU_ARM / R_LATCH
@@ -132,9 +164,31 @@ for cas in dp.CASSETTES:
                     omega_lock=[r["omega_lock"] for r in rows], T_range_uNm=[lo*1e6, hi*1e6],
                     t_recock_at_min_torque_s=recock(lo, J)["time_s"], t_recock_at_max_torque_s=recock(hi, J)["time_s"])
     dyn[cas]["time_margin_at_min_torque"] = BUDGET / dyn[cas]["t_recock_at_min_torque_s"]
-res["recock"] = dict(period_s=PERIOD, impulse_time_s=T_IMPULSE, budget_s=BUDGET, phi_free_rad=PHI_FREE, phi_cock_rad=PHI_COCK,
+res["recock"] = dict(period_s=PERIOD, beat_interval_s=PERIOD/2, impulse_time_s=T_IMPULSE, budget_s=BUDGET, budget_rev4_full_period_s=BUDGET_FULL_PERIOD,
+                     timeline=["balance pin trips latch (unlatch work)", "arm impulse over 15 deg (T_IMPULSE)", "arm tail releases the wheel detent via the release star",
+                               "wheel free arc PHI_FREE", "wheel cocking arc PHI_COCK re-latches the other arm", "detent re-locks the wheel (impact)", "next beat: other arm"],
+                     phi_free_rad=PHI_FREE, phi_cock_rad=PHI_COCK,
                      T_cock_uNm=(TAU_ARM * DTH_ARM / dp.LIFT_EFF) / PHI_COCK * 1e6, cassettes=dyn)
 res["recock"]["worst_case"] = min(((cas, d["t_recock_at_min_torque_s"], d["time_margin_at_min_torque"]) for cas, d in dyn.items()), key=lambda x: x[2])
+
+# ------------------------------------------------------------------ 4b. detent release kinematics (rev 5, from the CAD geometry)
+TAIL_A, TAIL_B = 16.0e-3, 14.0e-3                      # arm release tails (A ends 1 mm beyond the wheel axis, B 1 mm short)
+PEG_R = math.hypot(1.0e-3, 9.0e-3 + 1.95e-3)           # star peg radius from the escape axis
+DET_PIN_R, DET_ARM, DET_TAIL = 11.9e-3, 12.0e-3, 4.0e-3
+T_vec = np.array([DET_PIN_R - DET_TAIL, DET_ARM])      # L-tail end in (radial, tangential) coordinates at the pin
+T_r = float(np.hypot(*T_vec))
+cos_fac = T_vec[0] / T_r                               # fraction of the star-peg motion that moves the tail along its own motion direction
+rel = {}
+for name, Lt in (("arm A", TAIL_A), ("arm B", TAIL_B)):
+    tail_move = Lt * DTH_ARM
+    star_rot = tail_move / PEG_R
+    tail_push = star_rot * T_r * cos_fac
+    pin_withdraw = tail_push * DET_ARM / DET_TAIL
+    rel[name] = dict(tail_motion_mm=tail_move*1e3, star_rotation_mrad=star_rot*1e3, detent_tail_push_mm=tail_push*1e3, pin_withdrawal_mm=pin_withdraw*1e3)
+engage = (R_W + 0.5e-3) - DET_PIN_R                    # pin must clear the tip circle by its own radius
+res["detent_release"] = dict(per_arm=rel, required_withdrawal_mm=engage*1e3,
+                             margin={k: v["pin_withdrawal_mm"] / (engage*1e3) for k, v in rel.items()},
+                             note="first-order kinematics of the drawn linkage; the small margin is a bench-tuning item (tail length, pin radius)")
 
 # ------------------------------------------------------------------ 5. lock impact at the detent
 K_STOP = {"rigid steel pin on PETG (1e6 N/m)": 1.0e6, "printed flexure detent 0.8x4x8 mm (2000 N/m)": 3 * 2.0e9 * (4e-3 * 0.8e-3**3 / 12) / (8e-3)**3}
@@ -166,7 +220,7 @@ try:
     _r = json.load(open("results/system_results.json"))["oscillator"]; I, k = _r["I_kgm2"], _r["k_Nm_per_rad"]
 except Exception:
     pass
-base_E, base_U = dp.E_IMPULSE, dp.E_UNLATCH
+base_E, base_U = E_imp, dp.E_UNLATCH                 # rev 5: base impulse = forward-model value
 sens = []
 for fE in (0.9, 1.0, 1.1):
     for U in (E_unl[0], E_unl[1], E_unl[3]):
@@ -177,6 +231,7 @@ for fE in (0.9, 1.0, 1.1):
                          period_jitter_pct=100*r.get("period_jitter", float("nan"))))
 dp.E_IMPULSE, dp.E_UNLATCH = base_E, base_U
 res["rate_sensitivity"] = sens
+res["rate_sensitivity_base_E_uJ"] = base_E*1e6
 ok = [s for s in sens if s["status"] == "ok"]
 res["rate_sensitivity_summary"] = dict(rate_error_min_pct=min(s["rate_error_pct"] for s in ok), rate_error_max_pct=max(s["rate_error_pct"] for s in ok),
                                        spread_pct=max(s["rate_error_pct"] for s in ok) - min(s["rate_error_pct"] for s in ok),
@@ -193,7 +248,7 @@ for cas, d in dyn.items():
     ax.plot(d["T_uNm"], d["t_recock_s"], color=cols[cas], lw=0.8, alpha=0.5)
     lo, hi = d["T_range_uNm"]; sel = (np.array(d["T_uNm"]) >= lo*0.98) & (np.array(d["T_uNm"]) <= hi*1.02)
     ax.plot(np.array(d["T_uNm"])[sel], np.array(d["t_recock_s"])[sel], color=cols[cas], lw=2.2, label=f"{cas} cassette, J = {d['J_eff_kgm2']*1e9:.0f} g·mm²")
-ax.axhline(BUDGET, color=META_GREY, lw=0.8, ls="--"); ax.text(10.5, BUDGET*0.80, f"budget: one period minus impulse ({BUDGET:.2f} s)", ha="left", va="top", color=META_GREY, fontsize=6)
+ax.axhline(BUDGET, color=META_GREY, lw=0.8, ls="--"); ax.text(10.5, BUDGET*0.80, f"budget: half period minus impulse ({BUDGET:.2f} s)", ha="left", va="top", color=META_GREY, fontsize=6)
 ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlabel("Escape-wheel torque (µN·m)"); ax.set_ylabel("Re-cock + lock time (s)")
 ax.set_title("thick: each cassette's own torque range", fontsize=6, color=META_GREY, loc="left")
 ax.legend(loc="lower left", fontsize=5.5); panel_letter(ax, "a")

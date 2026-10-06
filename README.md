@@ -2,7 +2,7 @@
 
 **An electricity-free, volumetric, clockwork-governed syringe infusion driver for neonatal care in low-resource settings.**
 
-Design-and-simulation study: parametric 3D CAD (91 parts, interference-checked in 12 poses), physics-based validation, LaTeX manuscript, ISEF abstract and a bench validation protocol. *No physical prototype has been built yet.*
+Design-and-simulation study: parametric 3D CAD (95 parts, interference-checked in 12 poses), physics-based validation, LaTeX manuscript, ISEF abstract and a bench validation protocol. *No physical prototype has been built yet.*
 
 ![overview](figures/manuscript/fig1.png)
 
@@ -14,6 +14,8 @@ Two design results carry the project:
 2. **Taut-band balance** — a 38.1 µm (0.0015") × 2 mm feeler-gauge steel ribbon under 1 N pretension replaces pivots: 1.20 Hz, ±0.19 % orientation sensitivity (a cross-spring flexure pivot would be ~8 %), 166 MPa vs 350 MPa fatigue limit; a slotted clamp (L_h 18–26.5 mm) absorbs the ±2.5 µm stock tolerance.
 
 Predicted accuracy: 95 % of units within −1.14 … +1.15 % (requirement ±5 %); flow-restriction pumps: +45 % at 37 °C, −33 % at 100 mmHg back-pressure. Escapement torque margin ≥ 2.0× over all 5 syringes × 4 cassettes × 0–300 mmHg. BOM ≈ $40.
+
+**Revision 5** (external review round 6): arm-to-detent release linkage (release tails + release star + radial detent lever) and the trip reset ramp are now modelled and Boolean-checked; impulse energy predicted forward from a specified wire torsion spring; printed arm flexures replaced (they are 150× too stiff, not too soft); re-cock budget restated as half period minus impulse (0.36 s, margin 2.5×); "zero release bolus by construction" withdrawn in favour of a measured residual bolus; J_eff, detent deflection, protocol and bore-tolerance statements corrected.
 
 **Revision 4** (external review round 5): the snap-action occlusion trip is now fully modelled in CAD (keyed spacer, trip pin, sear on a vertical pivot, 2 N flag rod, rocker-driven capture pin, trip rail on parallel-motion cranks, drop rod and balance stop fork) in an *armed* and a *tripped* pose, and the stem capture is verified on the solids; the band clamps are slotted (hanger plate + bracket, M3 screws); a mechanism-level escapement analysis (`analysis_arm_mechanism.py`, Fig. 3) derives impulse and unlatch energies from geometry, integrates the wheel through re-cocking and sizes a compliant wheel detent (now in CAD); the interference check uses an explicit pair whitelist over 12 poses with a carriage-posed gear train; all 91 STLs are watertight; the figure scripts run standalone (`figstyle.py`). See `docs/ChronoFlow_Report.md` for the itemised log.
 
@@ -55,14 +57,14 @@ The figure scripts import the plotting helpers from `analysis/figstyle.py` when 
 ## Key numbers (from `results/*.json`, regenerated with this revision)
 - Oscillator: k = 0.295 mN·m/rad, I = 5.18e-06 kg·m², f = 1.2017 Hz, trims at 26.4 mm, regulation -2.4 … +3.1 %, orientation ±0.19 %, band stress 166 MPa
 - Escapement: T_min = 9.5 µN·m, worst margin 2.04× (BD 60 mL, 1 mL/h, 300 mmHg), torque 19.5–476 µN·m, power 17–416 µW; rate error 0.057 % at Q = 150
-- Mechanism level: re-cock + lock ≤ 0.14 s vs 0.77 s budget (worst 1 mL/h, margin 5.5×); unlatch 0.10–0.35 µJ (µ 0.1–0.4); surplus ≤ 98 µJ/beat → detent impact 0.62 N / 19 MPa with the flexure detent (14 N / 92 MPa if rigid); period error 0.050–0.106 % over E_imp ±10 % and the unlatch range
-- Occlusion trip: sensing travel 0.35 mm (sear geometry), preloads 5.0–25.8 N, flag travel 6 mm; capture check: pin engagement 1.45 mm, stem advanced 0.1 mm → 0.085 mm³ pin/stem interference (captured); balance free at ±0.04 rad, blocked at ±0.08 rad inside the fork
+- Mechanism level: impulse energy predicted forward from the spring (k = 1e-4 N·m/rad, 26.3° preload, µ = 0.15): E_imp = 1.20 µJ, droop 6 %; re-cock + lock ≤ 0.14 s vs the 0.36 s left in a beat interval (half period − impulse; worst 1 mL/h, margin 2.53×, 3.2–4.0× other cassettes); unlatch 0.10–0.35 µJ (µ 0.1–0.4); surplus ≤ 98 µJ/beat → detent impact 0.62 N / 19 MPa / 0.31 mm with the flexure detent (14 N / 92 MPa if rigid); detent-release pin withdrawal 0.94 / 0.83 mm vs 0.6 mm required (margin 1.6 / 1.4); period error 0.050–0.108 % over E_imp ±10 % and the unlatch range
+- Occlusion trip: sensing travel 0.35 mm (sear geometry), preloads 5.0–25.8 N, flag travel 6 mm; capture check: pin engagement 1.45 mm, stem advanced 0.1 mm → 0.085 mm³ pin/stem interference (captured); balance free at ±0.04 rad, blocked at ±0.08 rad inside the fork; reset ramp at the loading position: tripped head/ramp overlap 117 mm³, armed head clear
 - Structure: rack-pinion tooth stress 22.7 MPa (SF 2.2)
 - Energy: 4.23 J per wind, 0.37 J used in 20 h
-- CAD: 91 parts, 0 interference faults in 12 poses (20 allowed pairs with reasons), 91/91 STLs watertight
+- CAD: 95 parts, 0 interference faults in 12 poses (28 allowed pairs with reasons), 95/95 STLs watertight
 
 ## Status and limitations
-All performance figures are model predictions. The balance quality factor in air and printed-gear efficiencies are the least certain inputs (both swept). The spring-arm escapement in the CAD is a representative embodiment that will need bench iteration. See `docs/ChronoFlow_Report.md` §5–6 for the validation protocol and limitations.
+All performance figures are model predictions. The balance quality factor in air and printed-gear efficiencies are the least certain inputs (both swept). The spring-arm escapement in the CAD is a representative embodiment that will need bench iteration; the detent-release margin (1.4–1.6×) and the impulse contact parameters (preload, µ) are the first things to measure. See `docs/ChronoFlow_Report.md` §5–6 for the validation protocol and limitations.
 
 ## License
 MIT (code) · CC-BY-4.0 (CAD, figures, text). See `LICENSE`.

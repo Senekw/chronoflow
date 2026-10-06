@@ -51,6 +51,54 @@
    "reason": "locking pin pressed into the detent lever"
   },
   {
+   "a": "impulse arm A",
+   "b": "impulse arm A release crank",
+   "cap_mm3": 0.5,
+   "reason": "pin joint: arm tail end in the crank's tail-arm (drawn overlapping)"
+  },
+  {
+   "a": "impulse arm B",
+   "b": "impulse arm B release crank",
+   "cap_mm3": 0.5,
+   "reason": "pin joint: arm tail end in the crank's tail-arm"
+  },
+  {
+   "a": "impulse arm A torsion spring",
+   "b": "impulse arm A post",
+   "cap_mm3": 1.5,
+   "reason": "spring leg anchored in the frame post"
+  },
+  {
+   "a": "impulse arm B torsion spring",
+   "b": "impulse arm B post",
+   "cap_mm3": 1.5,
+   "reason": "spring leg anchored in the frame post"
+  },
+  {
+   "a": "impulse arm A release crank",
+   "b": "impulse arm A detent link",
+   "cap_mm3": 3.5,
+   "reason": "pin joint: link end in the crank's link-arm"
+  },
+  {
+   "a": "impulse arm B release crank",
+   "b": "impulse arm B detent link",
+   "cap_mm3": 3.5,
+   "reason": "pin joint: link end in the crank's link-arm"
+  },
+  {
+   "a": "impulse arm A detent link",
+   "b": "wheel detent",
+   "cap_mm3": 2.5,
+   "reason": "pin joint: link end in the detent L-tail"
+  },
+  {
+   "a": "impulse arm B detent link",
+   "b": "wheel detent",
+   "cap_mm3": 2.5,
+   "reason": "pin joint: link end in the detent L-tail"
+  },
+  {
    "a": "wheel detent flexure",
    "b": "wheel detent post",
    "cap_mm3": 7.0,
@@ -131,8 +179,8 @@
     "balance_angle": 0.0
    },
    "xc": 213.58,
-   "n_parts": 91,
-   "n_contacts": 15,
+   "n_parts": 95,
+   "n_contacts": 17,
    "faults": [],
    "allowed": [
     {
@@ -184,6 +232,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -198,6 +254,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -264,8 +328,8 @@
     "balance_angle": 0.6
    },
    "xc": 213.58,
-   "n_parts": 91,
-   "n_contacts": 17,
+   "n_parts": 95,
+   "n_contacts": 19,
    "faults": [],
    "allowed": [
     {
@@ -317,6 +381,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -331,6 +403,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -413,8 +493,8 @@
     "balance_angle": -0.6
    },
    "xc": 213.58,
-   "n_parts": 91,
-   "n_contacts": 17,
+   "n_parts": 95,
+   "n_contacts": 19,
    "faults": [],
    "allowed": [
     {
@@ -466,6 +546,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -480,6 +568,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -557,26 +653,34 @@
   },
   {
    "pose": {
-    "fill": 1.0,
+    "fill": 0.85,
     "tripped": true,
     "balance_angle": 0.0
    },
-   "xc": 213.58,
-   "n_parts": 91,
-   "n_contacts": 15,
+   "xc": 203.15,
+   "n_parts": 95,
+   "n_contacts": 18,
    "faults": [],
    "allowed": [
     {
-     "a": "W2 60T",
-     "b": "P2 12T",
-     "volume_mm3": 0.295,
+     "a": "carriage + rack",
+     "b": "P0 rack pinion",
+     "volume_mm3": 0.616,
      "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
+     "reason": "trapezoidal rack vs involute pinion tooth-tip overlap at the drawn phase (<= 0.11 mm^2 section)",
+     "cap_mm3": 1.0
     },
     {
-     "a": "W3 60T",
-     "b": "P3 12T",
+     "a": "W1 60T",
+     "b": "P1 12T",
+     "volume_mm3": 0.588,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion (profile shift +0.3 recommended)",
+     "cap_mm3": 0.7
+    },
+    {
+     "a": "W2 60T",
+     "b": "P2 12T",
      "volume_mm3": 0.304,
      "allowed": true,
      "reason": "tooth-tip overlap of the unshifted 12T pinion",
@@ -585,7 +689,7 @@
     {
      "a": "W4 30T",
      "b": "P4 12T",
-     "volume_mm3": 0.262,
+     "volume_mm3": 0.069,
      "allowed": true,
      "reason": "tooth-tip overlap of the unshifted 12T pinion",
      "cap_mm3": 0.4
@@ -615,6 +719,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -629,6 +741,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -695,156 +815,7 @@
     "balance_angle": 0.0
    },
    "xc": 178.79,
-   "n_parts": 91,
-   "n_contacts": 17,
-   "faults": [],
-   "allowed": [
-    {
-     "a": "carriage + rack",
-     "b": "P0 rack pinion",
-     "volume_mm3": 0.263,
-     "allowed": true,
-     "reason": "trapezoidal rack vs involute pinion tooth-tip overlap at the drawn phase (<= 0.11 mm^2 section)",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "W1 60T",
-     "b": "P1 12T",
-     "volume_mm3": 0.47,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion (profile shift +0.3 recommended)",
-     "cap_mm3": 0.7
-    },
-    {
-     "a": "W2 60T",
-     "b": "P2 12T",
-     "volume_mm3": 0.213,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "W3 60T",
-     "b": "P3 12T",
-     "volume_mm3": 0.085,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "W4 30T",
-     "b": "P4 12T",
-     "volume_mm3": 0.084,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "escape wheel 15T",
-     "b": "impulse arm A pallet pin",
-     "volume_mm3": 0.646,
-     "allowed": true,
-     "reason": "locked tooth resting on the pallet pin (line contact drawn with 0.1 mm penetration)",
-     "cap_mm3": 0.7
-    },
-    {
-     "a": "impulse arm A",
-     "b": "impulse arm A pallet pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "pallet pin pressed into the arm",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "impulse arm A",
-     "b": "impulse arm A pivot pin",
-     "volume_mm3": 7.854,
-     "allowed": true,
-     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
-     "cap_mm3": 8.0
-    },
-    {
-     "a": "impulse arm B",
-     "b": "impulse arm B pallet pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "pallet pin pressed into the arm",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "impulse arm B",
-     "b": "impulse arm B pivot pin",
-     "volume_mm3": 7.854,
-     "allowed": true,
-     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
-     "cap_mm3": 8.0
-    },
-    {
-     "a": "wheel detent",
-     "b": "wheel detent pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "locking pin pressed into the detent lever",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "wheel detent flexure",
-     "b": "wheel detent post",
-     "volume_mm3": 6.357,
-     "allowed": true,
-     "reason": "flexure root anchored in its post (printed as one part)",
-     "cap_mm3": 7.0
-    },
-    {
-     "a": "balance balance",
-     "b": "balance impulse_pin",
-     "volume_mm3": 2.827,
-     "allowed": true,
-     "reason": "impulse pin pressed into the hub",
-     "cap_mm3": 3.0
-    },
-    {
-     "a": "balance upper_clamp",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "M3 screws threaded through the clamp block",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance lower_clamp",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "guide pins pressed into the lower clamp",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance tensioner_seat",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "M3 screws threaded through the seat block",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance tensioner_guide",
-     "b": "balance clamp_screws",
-     "volume_mm3": 42.412,
-     "allowed": true,
-     "reason": "screw shanks passing through the bracket slots (slot drawn to the nominal position)",
-     "cap_mm3": 45.0
-    }
-   ]
-  },
-  {
-   "pose": {
-    "fill": 0.5,
-    "tripped": false,
-    "balance_angle": 0.6
-   },
-   "xc": 178.79,
-   "n_parts": 91,
+   "n_parts": 95,
    "n_contacts": 19,
    "faults": [],
    "allowed": [
@@ -913,6 +884,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -927,6 +906,179 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
+     "a": "wheel detent",
+     "b": "wheel detent pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "locking pin pressed into the detent lever",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "wheel detent flexure",
+     "b": "wheel detent post",
+     "volume_mm3": 6.357,
+     "allowed": true,
+     "reason": "flexure root anchored in its post (printed as one part)",
+     "cap_mm3": 7.0
+    },
+    {
+     "a": "balance balance",
+     "b": "balance impulse_pin",
+     "volume_mm3": 2.827,
+     "allowed": true,
+     "reason": "impulse pin pressed into the hub",
+     "cap_mm3": 3.0
+    },
+    {
+     "a": "balance upper_clamp",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "M3 screws threaded through the clamp block",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance lower_clamp",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "guide pins pressed into the lower clamp",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance tensioner_seat",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "M3 screws threaded through the seat block",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance tensioner_guide",
+     "b": "balance clamp_screws",
+     "volume_mm3": 42.412,
+     "allowed": true,
+     "reason": "screw shanks passing through the bracket slots (slot drawn to the nominal position)",
+     "cap_mm3": 45.0
+    }
+   ]
+  },
+  {
+   "pose": {
+    "fill": 0.5,
+    "tripped": false,
+    "balance_angle": 0.6
+   },
+   "xc": 178.79,
+   "n_parts": 95,
+   "n_contacts": 21,
+   "faults": [],
+   "allowed": [
+    {
+     "a": "carriage + rack",
+     "b": "P0 rack pinion",
+     "volume_mm3": 0.263,
+     "allowed": true,
+     "reason": "trapezoidal rack vs involute pinion tooth-tip overlap at the drawn phase (<= 0.11 mm^2 section)",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "W1 60T",
+     "b": "P1 12T",
+     "volume_mm3": 0.47,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion (profile shift +0.3 recommended)",
+     "cap_mm3": 0.7
+    },
+    {
+     "a": "W2 60T",
+     "b": "P2 12T",
+     "volume_mm3": 0.213,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "W3 60T",
+     "b": "P3 12T",
+     "volume_mm3": 0.085,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "W4 30T",
+     "b": "P4 12T",
+     "volume_mm3": 0.084,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "escape wheel 15T",
+     "b": "impulse arm A pallet pin",
+     "volume_mm3": 0.646,
+     "allowed": true,
+     "reason": "locked tooth resting on the pallet pin (line contact drawn with 0.1 mm penetration)",
+     "cap_mm3": 0.7
+    },
+    {
+     "a": "impulse arm A",
+     "b": "impulse arm A pallet pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "pallet pin pressed into the arm",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "impulse arm A",
+     "b": "impulse arm A pivot pin",
+     "volume_mm3": 7.854,
+     "allowed": true,
+     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
+     "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
+     "a": "impulse arm B",
+     "b": "impulse arm B pallet pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "pallet pin pressed into the arm",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "impulse arm B",
+     "b": "impulse arm B pivot pin",
+     "volume_mm3": 7.854,
+     "allowed": true,
+     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
+     "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -1009,8 +1161,8 @@
     "balance_angle": -0.6
    },
    "xc": 178.79,
-   "n_parts": 91,
-   "n_contacts": 19,
+   "n_parts": 95,
+   "n_contacts": 21,
    "faults": [],
    "allowed": [
     {
@@ -1078,6 +1230,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -1092,6 +1252,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -1174,8 +1342,8 @@
     "balance_angle": 0.0
    },
    "xc": 178.79,
-   "n_parts": 91,
-   "n_contacts": 17,
+   "n_parts": 95,
+   "n_contacts": 19,
    "faults": [],
    "allowed": [
     {
@@ -1243,6 +1411,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -1257,6 +1433,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -1323,156 +1507,7 @@
     "balance_angle": 0.0
    },
    "xc": 144.0,
-   "n_parts": 91,
-   "n_contacts": 17,
-   "faults": [],
-   "allowed": [
-    {
-     "a": "carriage + rack",
-     "b": "P0 rack pinion",
-     "volume_mm3": 0.275,
-     "allowed": true,
-     "reason": "trapezoidal rack vs involute pinion tooth-tip overlap at the drawn phase (<= 0.11 mm^2 section)",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "W1 60T",
-     "b": "P1 12T",
-     "volume_mm3": 0.405,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion (profile shift +0.3 recommended)",
-     "cap_mm3": 0.7
-    },
-    {
-     "a": "W2 60T",
-     "b": "P2 12T",
-     "volume_mm3": 0.143,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "W3 60T",
-     "b": "P3 12T",
-     "volume_mm3": 0.301,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "W4 30T",
-     "b": "P4 12T",
-     "volume_mm3": 0.069,
-     "allowed": true,
-     "reason": "tooth-tip overlap of the unshifted 12T pinion",
-     "cap_mm3": 0.4
-    },
-    {
-     "a": "escape wheel 15T",
-     "b": "impulse arm A pallet pin",
-     "volume_mm3": 0.646,
-     "allowed": true,
-     "reason": "locked tooth resting on the pallet pin (line contact drawn with 0.1 mm penetration)",
-     "cap_mm3": 0.7
-    },
-    {
-     "a": "impulse arm A",
-     "b": "impulse arm A pallet pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "pallet pin pressed into the arm",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "impulse arm A",
-     "b": "impulse arm A pivot pin",
-     "volume_mm3": 7.854,
-     "allowed": true,
-     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
-     "cap_mm3": 8.0
-    },
-    {
-     "a": "impulse arm B",
-     "b": "impulse arm B pallet pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "pallet pin pressed into the arm",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "impulse arm B",
-     "b": "impulse arm B pivot pin",
-     "volume_mm3": 7.854,
-     "allowed": true,
-     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
-     "cap_mm3": 8.0
-    },
-    {
-     "a": "wheel detent",
-     "b": "wheel detent pin",
-     "volume_mm3": 0.982,
-     "allowed": true,
-     "reason": "locking pin pressed into the detent lever",
-     "cap_mm3": 1.0
-    },
-    {
-     "a": "wheel detent flexure",
-     "b": "wheel detent post",
-     "volume_mm3": 6.357,
-     "allowed": true,
-     "reason": "flexure root anchored in its post (printed as one part)",
-     "cap_mm3": 7.0
-    },
-    {
-     "a": "balance balance",
-     "b": "balance impulse_pin",
-     "volume_mm3": 2.827,
-     "allowed": true,
-     "reason": "impulse pin pressed into the hub",
-     "cap_mm3": 3.0
-    },
-    {
-     "a": "balance upper_clamp",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "M3 screws threaded through the clamp block",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance lower_clamp",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "guide pins pressed into the lower clamp",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance tensioner_seat",
-     "b": "balance clamp_screws",
-     "volume_mm3": 70.686,
-     "allowed": true,
-     "reason": "M3 screws threaded through the seat block",
-     "cap_mm3": 75.0
-    },
-    {
-     "a": "balance tensioner_guide",
-     "b": "balance clamp_screws",
-     "volume_mm3": 42.412,
-     "allowed": true,
-     "reason": "screw shanks passing through the bracket slots (slot drawn to the nominal position)",
-     "cap_mm3": 45.0
-    }
-   ]
-  },
-  {
-   "pose": {
-    "fill": 0.0,
-    "tripped": false,
-    "balance_angle": 0.6
-   },
-   "xc": 144.0,
-   "n_parts": 91,
+   "n_parts": 95,
    "n_contacts": 19,
    "faults": [],
    "allowed": [
@@ -1541,6 +1576,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -1555,6 +1598,179 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
+     "a": "wheel detent",
+     "b": "wheel detent pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "locking pin pressed into the detent lever",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "wheel detent flexure",
+     "b": "wheel detent post",
+     "volume_mm3": 6.357,
+     "allowed": true,
+     "reason": "flexure root anchored in its post (printed as one part)",
+     "cap_mm3": 7.0
+    },
+    {
+     "a": "balance balance",
+     "b": "balance impulse_pin",
+     "volume_mm3": 2.827,
+     "allowed": true,
+     "reason": "impulse pin pressed into the hub",
+     "cap_mm3": 3.0
+    },
+    {
+     "a": "balance upper_clamp",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "M3 screws threaded through the clamp block",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance lower_clamp",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "guide pins pressed into the lower clamp",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance tensioner_seat",
+     "b": "balance clamp_screws",
+     "volume_mm3": 70.686,
+     "allowed": true,
+     "reason": "M3 screws threaded through the seat block",
+     "cap_mm3": 75.0
+    },
+    {
+     "a": "balance tensioner_guide",
+     "b": "balance clamp_screws",
+     "volume_mm3": 42.412,
+     "allowed": true,
+     "reason": "screw shanks passing through the bracket slots (slot drawn to the nominal position)",
+     "cap_mm3": 45.0
+    }
+   ]
+  },
+  {
+   "pose": {
+    "fill": 0.0,
+    "tripped": false,
+    "balance_angle": 0.6
+   },
+   "xc": 144.0,
+   "n_parts": 95,
+   "n_contacts": 21,
+   "faults": [],
+   "allowed": [
+    {
+     "a": "carriage + rack",
+     "b": "P0 rack pinion",
+     "volume_mm3": 0.275,
+     "allowed": true,
+     "reason": "trapezoidal rack vs involute pinion tooth-tip overlap at the drawn phase (<= 0.11 mm^2 section)",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "W1 60T",
+     "b": "P1 12T",
+     "volume_mm3": 0.405,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion (profile shift +0.3 recommended)",
+     "cap_mm3": 0.7
+    },
+    {
+     "a": "W2 60T",
+     "b": "P2 12T",
+     "volume_mm3": 0.143,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "W3 60T",
+     "b": "P3 12T",
+     "volume_mm3": 0.301,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "W4 30T",
+     "b": "P4 12T",
+     "volume_mm3": 0.069,
+     "allowed": true,
+     "reason": "tooth-tip overlap of the unshifted 12T pinion",
+     "cap_mm3": 0.4
+    },
+    {
+     "a": "escape wheel 15T",
+     "b": "impulse arm A pallet pin",
+     "volume_mm3": 0.646,
+     "allowed": true,
+     "reason": "locked tooth resting on the pallet pin (line contact drawn with 0.1 mm penetration)",
+     "cap_mm3": 0.7
+    },
+    {
+     "a": "impulse arm A",
+     "b": "impulse arm A pallet pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "pallet pin pressed into the arm",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "impulse arm A",
+     "b": "impulse arm A pivot pin",
+     "volume_mm3": 7.854,
+     "allowed": true,
+     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
+     "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
+     "a": "impulse arm B",
+     "b": "impulse arm B pallet pin",
+     "volume_mm3": 0.982,
+     "allowed": true,
+     "reason": "pallet pin pressed into the arm",
+     "cap_mm3": 1.0
+    },
+    {
+     "a": "impulse arm B",
+     "b": "impulse arm B pivot pin",
+     "volume_mm3": 7.854,
+     "allowed": true,
+     "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
+     "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -1637,8 +1853,8 @@
     "balance_angle": -0.6
    },
    "xc": 144.0,
-   "n_parts": 91,
-   "n_contacts": 19,
+   "n_parts": 95,
+   "n_contacts": 21,
    "faults": [],
    "allowed": [
     {
@@ -1706,6 +1922,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -1720,6 +1944,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",
@@ -1802,8 +2034,8 @@
     "balance_angle": 0.0
    },
    "xc": 144.0,
-   "n_parts": 91,
-   "n_contacts": 17,
+   "n_parts": 95,
+   "n_contacts": 19,
    "faults": [],
    "allowed": [
     {
@@ -1871,6 +2103,14 @@
      "cap_mm3": 8.0
     },
     {
+     "a": "impulse arm A torsion spring",
+     "b": "impulse arm A post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
+    },
+    {
      "a": "impulse arm B",
      "b": "impulse arm B pallet pin",
      "volume_mm3": 0.982,
@@ -1885,6 +2125,14 @@
      "allowed": true,
      "reason": "pivot pin pressed into the arm root (flexure-mounted arm)",
      "cap_mm3": 8.0
+    },
+    {
+     "a": "impulse arm B torsion spring",
+     "b": "impulse arm B post",
+     "volume_mm3": 1.271,
+     "allowed": true,
+     "reason": "spring leg anchored in the frame post",
+     "cap_mm3": 1.5
     },
     {
      "a": "wheel detent",

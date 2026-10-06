@@ -54,7 +54,7 @@ state(0.0, "1  armed", "preload $F_0$ = spacer × 3 N/mm;\nsear holds flag rod d
 _ds, _dF, _fl = dp.TRIP_SENSE_TRAVEL, dp.TRIP_SPRING_RATE*dp.TRIP_SENSE_TRAVEL, dp.FLAG_TRAVEL
 state(10.3, "2  sensing", f"F > $F_0$: stem retracts {_ds:.2f} mm\n(+{_dF:.2f} N); trip pin turns the sear", _ds*1.5, False, False, False)
 state(20.6, "3  tripped", f"sear frees flag rod (up {_fl:.0f} mm): rocker drops capture\npin into stem slot; rail lifts fork onto balance spoke", _ds*1.5, True, True, True)
-ax.text(0.2, 0.3, "stem captured ⇒ stored spring compression cannot advance the plunger when the blockage clears; reset only by the LOAD/RUN lever", fontsize=5.5, color="#333333")
+ax.text(0.2, 0.3, "stem captured ⇒ stored spring compression cannot advance the plunger when the blockage clears; reset by the ramp at the loading (fully retracted) position", fontsize=5.5, color="#333333")
 # panel b: force vs stem travel
 ax2 = fig.add_subplot(gs[1, 0])
 k = R["occlusion"]["spring_rate_N_per_mm"]; ds = R["occlusion"]["sense_travel_mm"]
@@ -81,6 +81,6 @@ for (r_, c_), cell in tb.get_celld().items():
     cell.set_edgecolor("#bbbbbb"); cell.set_linewidth(0.5)
     if r_ == 0: cell.set_text_props(weight="bold"); cell.set_height(cell.get_height()*1.6)
 ax3.set_title("Trip settings per syringe (300 mmHg nominal)")
-ax3.text(0.5, -0.02, "fires-at band: ±1.5 N plunger-friction uncertainty.\nMechanical release bolus = 0: the stem is captured (verified by\nsolid-boolean check, Fig. 6d); the remaining bolus is line compliance\nat 300 mmHg, measured in protocol step 5", transform=ax3.transAxes, ha="center", va="top", fontsize=6, color="#444444")
+ax3.text(0.5, -0.02, "fires-at band: ±1.5 N plunger-friction uncertainty.\nIdeally the captured stem releases none of the stored displacement\n(geometric restraint verified by solid Booleans, Fig. 7d); the residual\ndisplacement and total release bolus are measured in protocol step 5", transform=ax3.transAxes, ha="center", va="top", fontsize=6, color="#444444")
 panel_letter(ax, "a"); panel_letter(ax2, "b"); panel_letter(ax3, "c")
 fig.savefig("figures/fig6_occlusion_trip.png", dpi=300)

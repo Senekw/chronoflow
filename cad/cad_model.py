@@ -247,7 +247,9 @@ RAIL_Y_TRIP, RAIL_ZB, RAIL_H = 72.0, 100.0, 4.0
 CRANK_POSTS, CRANK_L = (70.0, 238.0), 20.0   # parallel-motion cranks: the rail translates (rises FLAG_TRAVEL everywhere)
 RAIL_X0, RAIL_X1 = CRANK_POSTS[0] + CRANK_L - 2.0, CRANK_POSTS[1] + CRANK_L + 1.5
 DROP_X = 96.0
-STOP_R, STOP_ANGLES = 18.0, (80.0, 100.0)   # fork pins straddle the 90-degree spoke: +/-4.8 deg free play < 6 deg unlock
+STOP_R, STOP_ANGLES = 18.0, (80.0, 100.0)
+DETENT_PIN_R, DETENT_ARM, DETENT_TAIL = 11.9, 12.0, 4.0   # detent pin radius on the wheel; pivot offset (tangential); L-tail length (ratio 3:1)
+RESET_RAMP_X0, RESET_RAMP_X1, RESET_RAMP_GRADE = 222.0, 234.0, 1.0   # ramp underside: 6 mm drop over x = 222..228 (flag head edge reaches it at xc = 206, fully down at xc = 212), then flat to 236   # fork pins straddle the 90-degree spoke: +/-4.8 deg free play < 6 deg unlock
 
 def _stack_rings(x0, x1, ro, ri, axis="x", yz=(0, 0), n=None):
     L = x1 - x0; n = n or max(2, int(L / 1.6))
@@ -316,7 +318,7 @@ def trip_mechanism(xc, tripped=False, syringe="BD 20 mL", stem_advance=0.0):
     rod = cq.Workplane("XY").circle(FLAG_ROD_R).extrude(100.0 - 60.0).translate((fx, FLAG_Y, 60.0 + dz))
     lift_collar = cq.Workplane("XY").circle(3.5).extrude(2.0).translate((fx, FLAG_Y, ROCKER_Z[1] + dz))          # 76..78
     hook_collar = cq.Workplane("XY").circle(3.0).extrude(2.0).translate((fx, FLAG_Y, SEAR_Z[0] - 2.0 + dz))      # 80..82
-    head = cq.Workplane("XY").box(10, 16, 4, centered=(True, True, False)).translate((fx, FLAG_Y, 96.0 + dz))
+    head = cq.Workplane("XY").box(6, 16, 4, centered=(True, True, False)).translate((fx, FLAG_Y, 96.0 + dz))   # 6 mm in x: its leading edge rides the reset ramp
     flag_rod = rod.union(lift_collar).union(hook_collar).union(head)
     boss = cq.Workplane("XY").circle(4.0).circle(FLAG_ROD_R + 0.1).extrude(4.0).translate((fx, FLAG_Y, 66.0))
     flag_spring = _stack_rings(70.3, ROCKER_Z[1] + dz - 0.3, 2.8, 2.0, axis="z", yz=(fx, FLAG_Y), n=3)
@@ -393,7 +395,19 @@ def trip_rail_linkage(xc, tripped=False):
             (bx + STOP_R * math.cos(math.radians(a)) - dx_trip, by + STOP_R * math.sin(math.radians(a)), z_arm + 4))
         link = link.union(p)
     link = link.translate((dx, 0, dz))
-    return dict(trip_rail=rail, rail_posts=posts, rail_cranks=cranks, rail_pins=pins, stop_linkage=link)
+    # rev 5: RESET RAMP.  Pulling the carriage fully back to load (xc -> CAR_X_MAX) runs the flag head under a frame-mounted
+    # ramp that presses the rod down 6 mm: the hook collar re-engages the sear (sear snaps in on its return spring, collar
+    # bottom chamfered) and the lift collar turns the rocker back, raising the capture pin out of the stem slot.
+    ramp_x0, ramp_x1, ramp_slope = RESET_RAMP_X0, RESET_RAMP_X0 + FLAG_TRAVEL / RESET_RAMP_GRADE, RESET_RAMP_X1
+    z_hi, z_lo = RAIL_ZB + FLAG_TRAVEL, RAIL_ZB                    # head top tripped -> head top armed
+    prof = [(ramp_x0, z_hi), (ramp_x1, z_lo), (ramp_slope, z_lo), (ramp_slope, z_lo + 3.0), (ramp_x1, z_lo + 3.0), (ramp_x0, z_hi + 3.0)]
+    ramp = cq.Workplane("XZ").polyline(prof).close().extrude(-6.0).translate((0, FLAG_Y - 6.0, 0))      # y 61..67 (beside the rail, y 69..75)
+    web = cq.Workplane("XY").box(3, 6, 111.0 - (z_lo + 3.0), centered=(False, True, False)).translate((ramp_slope - 7.0, FLAG_Y - 3.0, z_lo + 3.0))
+    xp = CRANK_POSTS[1]
+    bracket = cq.Workplane("XY").box(xp + 3 - (ramp_slope - 7.0), 80.0 - (FLAG_Y - 6.0), 3, centered=(False, False, False)).translate((ramp_slope - 7.0, FLAG_Y - 6.0, 111.0))
+    column = cq.Workplane("XY").box(6, 3.5, 111.0, centered=(True, False, False)).translate((xp, 76.5, 0))       # on the deck, outboard of the rail
+    ramp_post = web.union(bracket).union(column)
+    return dict(trip_rail=rail, rail_posts=posts, rail_cranks=cranks, rail_pins=pins, stop_linkage=link, reset_ramp=ramp.union(ramp_post))
 
 def spring_drum():
     cx, cz = 18.0, 21.0
@@ -507,7 +521,7 @@ def spring_arm_escapement():
     each with a steel pallet pin that is lifted (cocked) by the wheel teeth, a printed flexure
     spring, and a latch released by the balance impulse pin.  Representative embodiment."""
     ex, ey = S["S7"]; bx, by = BAL_XY
-    parts = {}
+    parts = {}; RELEASE_TAILS = []
     # arm pivots: between wheel and balance, 14 mm from wheel centre toward the balance, +/-9 mm sideways
     ux, uy = (bx-ex), (by-ey); L = math.hypot(ux, uy); ux, uy = ux/L, uy/L
     nx, ny = -uy, ux
@@ -523,33 +537,65 @@ def spring_arm_escapement():
         parts[name] = arm
         parts[name + " pallet pin"] = cq.Workplane("XY").circle(0.5).extrude(LV["L7"] + 2.0 - (z0 - 0.5)).translate((wx, wy, z0-0.5))
         parts[name + " pivot pin"] = cq.Workplane("XY").circle(SHAFT_D/2 - 0.5).extrude(12).translate((px, py, z0-7))
-        # flexure spring: thin printed cantilever from a frame post pressing the arm toward the balance
+        # rev 5: arm preload spring = music-wire torsion spring around the pivot pin (k ~ 1e-4 N m/rad, 25 deg preload);
+        # the printed 0.8 mm flexure of earlier revisions (k = 0.0149 N m/rad) is 150x too stiff to act as a constant-force
+        # element (analysis_arm_mechanism.py).  Stand-in: coil above the arm, straight leg anchored on the frame post.
         sx, sy = px + sgn*8*nx, py + sgn*8*ny
-        parts[name + " flexure"] = cq.Workplane("XY").box(0.8, 14, 2.5, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(uy, ux))).translate((sx + 7*ux, sy + 7*uy, z0))
-        parts[name + " post"] = cq.Workplane("XY").circle(2).extrude(16).translate((sx, sy, z0-8))
+        parts[name + " torsion spring"] = (_stack_rings(z0 + 2.6, z0 + 6.6, 2.6, 1.9, axis="z", yz=(px, py), n=4)
+            .union(cq.Workplane("XY").box(math.hypot(sx - px, sy - py), 0.8, 0.8, centered=(False, True, False))
+                   .rotate((0, 0, 0), (0, 0, 1), math.degrees(math.atan2(sy - py, sx - px))).translate((px, py, z0 + 6.6))))
+        parts[name + " post"] = cq.Workplane("XY").circle(2).extrude(z0 + 8 - BOTTOM_Z[1]).translate((sx, sy, BOTTOM_Z[1]))
+        # rev 5: release tail behind the pivot.  Tail A ends 1 mm beyond the wheel axis (16 mm), tail B 1 mm short of it
+        # (14 mm), so that the two tails -- which move in opposite n-directions -- turn the release star the SAME way.
+        Lt = 15.0 - sgn * 1.0
+        tx, ty = px - Lt*ux, py - Lt*uy
+        parts[name] = parts[name].union(cq.Workplane("XY").box(Lt, 2.4, 2.5, centered=(False, True, False))
+                                        .rotate((0, 0, 0), (0, 0, 1), math.degrees(math.atan2(-uy, -ux))).translate((px, py, z0)))
+        RELEASE_TAILS.append((sgn, tx, ty))
     # latch block between the arms, released by the balance impulse pin
     lx, ly = ex + 30*ux, ey + 30*uy
     parts["latch"] = cq.Workplane("XY").box(4, 10, 5.5, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(uy, ux))).translate((lx, ly, LV["L7"] - 8.5))
-    # rev 4: compliant wheel DETENT on the far side of the wheel.  The wheel is locked by this detent (not by the arm)
-    # during impulse and released by the arm at the end of its stroke; its 0.8 x 4 x 8 mm PETG flexure (k ~ 2000 N/m)
-    # limits the lock impact to < 0.7 N / 19 MPa at 476 uN m (analysis_arm_mechanism.py).  Representative embodiment.
-    zd = LV["L7"] - 2.5 - 0.5
+    # rev 4/5: compliant wheel DETENT.  The wheel is locked by this detent (not by the arm) during impulse.  rev 5 makes the
+    # release path explicit: each impulse arm carries a tail that, at the end of the impulse stroke, pushes a peg of a
+    # RELEASE STAR turning freely on a stub axle coaxial with the escape shaft (below the wheel); the star's third arm
+    # pushes the L-tail of the detent lever, whose pivot sits tangentially beside the pin so the pin withdraws RADIALLY
+    # out of the tooth gap.  The detent flexure (0.8 x 4 x 8 mm PETG, k ~ 2000 N/m) returns it and takes the lock impact.
+    zd = LV["L7"] - 5.5                                               # lever -41.5..-39 (below the wheel plane); only the pin enters the teeth
     ang_back = math.atan2(-uy, -ux); pitch = 2*math.pi/dp.Z_ESCAPE
     a_pin = round(ang_back / pitch) * pitch + 0.21                    # in the gap behind a tooth root
-    r_pin = 10.3
-    pxd, pyd = ex + r_pin*math.cos(a_pin), ey + r_pin*math.sin(a_pin)
-    dvx, dvy = -ux, -uy; dnx, dny = -uy, ux                           # detent axis points away from the balance
-    hub_x, hub_y = ex + 20*dvx, ey + 20*dvy                           # detent pivot post
-    lever = cq.Workplane("XY").polyline([(hub_x + 2*dnx, hub_y + 2*dny), (hub_x - 2*dnx, hub_y - 2*dny),
-                                         (pxd - 1.2*dnx, pyd - 1.2*dny), (pxd + 1.2*dnx, pyd + 1.2*dny)]).close().extrude(2.5).translate((0, 0, zd))
+    r_pin = DETENT_PIN_R
+    rhx, rhy = math.cos(a_pin), math.sin(a_pin); thx, thy = -math.sin(a_pin), math.cos(a_pin)   # radial / tangential unit vectors at the pin
+    pxd, pyd = ex + r_pin*rhx, ey + r_pin*rhy
+    hub_x, hub_y = pxd + DETENT_ARM*thx, pyd + DETENT_ARM*thy          # pivot tangentially beside the pin -> radial pin motion
+    tlx, tly = hub_x - DETENT_TAIL*rhx, hub_y - DETENT_TAIL*rhy         # L-tail end (toward the wheel axis)
+    def bar(x0, y0, x1, y1, w, h, z):
+        L_ = math.hypot(x1 - x0, y1 - y0)
+        return cq.Workplane("XY").box(L_, w, h, centered=(False, True, False)).rotate((0, 0, 0), (0, 0, 1), math.degrees(math.atan2(y1 - y0, x1 - x0))).translate((x0, y0, z))
+    lever = bar(hub_x, hub_y, pxd, pyd, 2.4, 2.5, zd).union(bar(hub_x, hub_y, tlx, tly, 2.4, 2.5, zd))
     lever = lever.union(cq.Workplane("XY").circle(2.5).extrude(2.5).translate((hub_x, hub_y, zd)))
     lever = lever.cut(cq.Workplane("XY").circle(1.05).extrude(4).translate((hub_x, hub_y, zd - 0.5)))
     parts["wheel detent"] = lever
     parts["wheel detent pin"] = cq.Workplane("XY").circle(0.5).extrude(LV["L7"] + 2.0 - (zd - 0.5)).translate((pxd, pyd, zd - 0.5))
-    parts["wheel detent pivot pin"] = cq.Workplane("XY").circle(1.0).extrude(10).translate((hub_x, hub_y, zd - 6))
-    fx_, fy_ = hub_x + 6*dnx + 4*dvx, hub_y + 6*dny + 4*dvy          # flexure beside the lever, anchored on a post
-    parts["wheel detent flexure"] = cq.Workplane("XY").box(8, 0.8, 4, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(dvy, dvx))).translate((fx_, fy_, zd - 0.5))
-    parts["wheel detent post"] = cq.Workplane("XY").circle(2).extrude(12).translate((fx_ + 4*dvx, fy_ + 4*dvy, zd - 8))
+    parts["wheel detent pivot pin"] = cq.Workplane("XY").circle(1.0).extrude(zd + 4 - BOTTOM_Z[1]).translate((hub_x, hub_y, BOTTOM_Z[1]))
+    fx_, fy_ = hub_x + 5*rhx + 4*thx, hub_y + 5*rhy + 4*thy             # flexure outboard of the hub, pressing the lever toward the wheel
+    parts["wheel detent flexure"] = cq.Workplane("XY").box(8, 0.8, 4, centered=(True, True, False)).rotate((0,0,0),(0,0,1), math.degrees(math.atan2(rhy, rhx))).translate((fx_, fy_, zd - 0.5))
+    parts["wheel detent post"] = cq.Workplane("XY").circle(2).extrude(zd + 4 - BOTTOM_Z[1]).translate((fx_ + 4*rhx, fy_ + 4*rhy, BOTTOM_Z[1]))
+    # release star on a stub axle coaxial with S7, below the shaft end
+    zs = LV["L7"] - 11.5                                              # star plate -47.5..-45.5
+    star = cq.Workplane("XY").circle(3.5).extrude(2.0).translate((ex, ey, zs))
+    pegs = None
+    for sgn, tx, ty in RELEASE_TAILS:                                  # pegs beside each tail end (tail pushes the peg sideways)
+        qx, qy = tx + sgn*1.95*nx, ty + sgn*1.95*ny
+        star = star.union(bar(ex, ey, qx, qy, 2.4, 2.0, zs))
+        peg = cq.Workplane("XY").circle(0.75).extrude(zd + 2.5 - (zs + 2.0)).translate((qx, qy, zs + 2.0))
+        pegs = peg if pegs is None else pegs.union(peg)
+    qx, qy = tlx - 1.95*thx, tly - 1.95*thy                            # peg against the detent L-tail
+    star = star.union(bar(ex, ey, qx, qy, 2.4, 2.0, zs))
+    pegs = pegs.union(cq.Workplane("XY").circle(0.75).extrude(zd + 2.5 - (zs + 2.0)).translate((qx, qy, zs + 2.0)))
+    star = star.cut(cq.Workplane("XY").circle(1.05).extrude(4).translate((ex, ey, zs - 1)))
+    parts["release star"] = star
+    parts["release star pegs"] = pegs
+    parts["release star axle"] = cq.Workplane("XY").circle(1.0).extrude(zs + 2.0 - BOTTOM_Z[1]).translate((ex, ey, BOTTOM_Z[1]))
     return parts
 
 def balance_assembly():
@@ -667,7 +713,7 @@ def build(cassette="10 mL/h", fill=0.85, exploded=0.0, tripped=False, balance_an
                  capture_pin="stem capture pin", capture_boss="capture pin guide")
     for k, p in tm.items(): add(p, tname[k], tcol[k], 50)
     rl_name = dict(trip_rail="trip rail", rail_posts="trip rail posts", rail_cranks="trip rail cranks", rail_pins="trip rail pivot pins",
-                   stop_linkage="drop rod + balance stop fork")
+                   stop_linkage="drop rod + balance stop fork", reset_ramp="trip reset ramp")
     for k, p in trip_rail_linkage(xc, tripped).items():
         add(p, rl_name[k], COL["steel"] if k in ("stop_linkage", "rail_pins") else COL["print2"], 80)
     drum, coil, bracket, axle = spring_drum()
@@ -680,7 +726,7 @@ def build(cassette="10 mL/h", fill=0.85, exploded=0.0, tripped=False, balance_an
     add(ratchet_click(), "winding ratchet click", COL["steel"], 0)
     add(cassette_plate(), f"rate cassette plate ({cassette})", COL["print2"], -10)
     for k, p in spring_arm_escapement().items():
-        add(p, k, COL["steel"] if "pin" in k else COL["print2"], -30)
+        add(p, k, COL["steel"] if ("pin" in k or "spring" in k or "link" in k or "post" in k) else COL["print2"], -30)
     for k, p in balance_assembly().items():
         c = {"balance": COL["print"], "trims": COL["brass"], "impulse_pin": COL["steel"], "band_upper": COL["band"], "band_lower": COL["band"],
              "upper_clamp": COL["frame"], "upper_post": COL["frame"], "lower_clamp": COL["frame"], "tensioner": COL["spring"],

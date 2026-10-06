@@ -22,6 +22,14 @@ ALLOWED = [
     ("escape wheel 15T", "impulse arm B pallet pin", 0.7, "locked tooth resting on the pallet pin"),
     ("balance balance", "balance impulse_pin", 3.0, "impulse pin pressed into the hub"),
     ("wheel detent", "wheel detent pin", 1.0, "locking pin pressed into the detent lever"),
+    ("impulse arm A", "impulse arm A release crank", 0.5, "pin joint: arm tail end in the crank's tail-arm (drawn overlapping)"),
+    ("impulse arm B", "impulse arm B release crank", 0.5, "pin joint: arm tail end in the crank's tail-arm"),
+    ("impulse arm A torsion spring", "impulse arm A post", 1.5, "spring leg anchored in the frame post"),
+    ("impulse arm B torsion spring", "impulse arm B post", 1.5, "spring leg anchored in the frame post"),
+    ("impulse arm A release crank", "impulse arm A detent link", 3.5, "pin joint: link end in the crank's link-arm"),
+    ("impulse arm B release crank", "impulse arm B detent link", 3.5, "pin joint: link end in the crank's link-arm"),
+    ("impulse arm A detent link", "wheel detent", 2.5, "pin joint: link end in the detent L-tail"),
+    ("impulse arm B detent link", "wheel detent", 2.5, "pin joint: link end in the detent L-tail"),
     ("wheel detent flexure", "wheel detent post", 7.0, "flexure root anchored in its post (printed as one part)"),
     ("balance upper_clamp", "balance clamp_screws", 75.0, "M3 screws threaded through the clamp block"),
     ("balance lower_clamp", "balance clamp_screws", 75.0, "guide pins pressed into the lower clamp"),
@@ -37,10 +45,14 @@ ALLOWED = [
 ]
 
 def allowed_for(a, b):
+    """Most specific matching entry (longest key pair) wins, so e.g. ('impulse arm A', 'impulse arm A release crank')
+    does not shadow ('impulse arm A release crank', 'impulse arm A detent link')."""
+    best = None
     for ka, kb, cap, why in ALLOWED:
         if (ka in a and kb in b) or (ka in b and kb in a):
-            return cap, why
-    return None, None
+            if best is None or len(ka) + len(kb) > best[0]:
+                best = (len(ka) + len(kb), cap, why)
+    return (best[1], best[2]) if best else (None, None)
 
 def check(asm, vol_tol=VOL_TOL, bb_tol=0.05):
     objs = [(ch.name, ch.obj.val() if hasattr(ch.obj, "val") else ch.obj) for ch in asm.children]
@@ -68,7 +80,9 @@ def poses():
     for fill in (1.0, 0.5, 0.0):
         for ang in (0.0, 0.6, -0.6):
             P.append(dict(fill=fill, tripped=False, balance_angle=ang))
-        P.append(dict(fill=fill, tripped=True, balance_angle=0.0))
+        # tripped poses: fill 1.0 is the fully retracted loading position, where the reset ramp has already pushed the
+        # flag rod down (the trip cannot be in the tripped state there), so the tripped pose is taken at 0.85 fill instead
+        P.append(dict(fill=0.85 if fill == 1.0 else fill, tripped=True, balance_angle=0.0))
     return P
 
 def run(cassette="10 mL/h", out="results/interference_report.json"):
@@ -96,7 +110,8 @@ def verify_trip(fill=0.5, out="results/trip_capture_check.json"):
     """Functional checks of the modelled snap-action trip by solid booleans:
     (1) armed: capture pin clear of the stem; (2) tripped: pin engaged in the stem slot;
     (3) tripped + stem advanced 0.1/0.2 mm toward the syringe: pin/stem overlap (captured -> no release bolus);
-    (4) tripped: balance free to swing +/-0.04 rad inside the fork but blocked at +/-0.08 rad (< 6 deg unlock angle)."""
+    (4) tripped: balance free to swing +/-0.04 rad inside the fork but blocked at +/-0.08 rad (< 6 deg unlock angle);
+    (5) reset ramp: at the loading position the tripped flag head would intersect the ramp (ramp pushes it down), the armed head is clear."""
     import cad_model as cm
     res = {}
     def parts(**kw):
@@ -115,6 +130,12 @@ def verify_trip(fill=0.5, out="results/trip_capture_check.json"):
         res[f"tripped_balance_{ang:+.2f}rad_fork_overlap_mm3"] = round(_common_volume(P["drop rod + balance stop fork"], P["balance balance"]), 4)
     P, _ = parts(tripped=False, balance_angle=0.6)
     res["armed_balance_+0.60rad_fork_overlap_mm3"] = round(_common_volume(P["drop rod + balance stop fork"], P["balance balance"]), 4)
+    # reset ramp: at the fully retracted (loading) position the ramp must have pushed the flag head down: posing the
+    # TRIPPED mechanism there must show head/ramp overlap (the ramp drives the reset), the ARMED pose must be clear
+    for trip in (True, False):
+        P, xcf = parts(tripped=trip) if False else (lambda a: ({c.name: c.obj.val() for c in a[0].children}, a[1]))(cm.build(fill=1.0, tripped=trip))
+        res[f"loading_position_{'tripped' if trip else 'armed'}_head_ramp_overlap_mm3"] = round(_common_volume(P["flag rod + occlusion flag"], P["trip reset ramp"]), 3)
+    res["loading_position_xc"] = round(xcf, 2)
     res["sense_travel_mm"] = cm.SENSE_TRAVEL; res["flag_travel_mm"] = cm.FLAG_TRAVEL; res["xc"] = round(xc, 2)
     json.dump(res, open(out, "w"), indent=1)
     return res

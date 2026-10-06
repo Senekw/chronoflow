@@ -10,6 +10,9 @@
  "tripped_balance_-0.04rad_fork_overlap_mm3": 0.0,
  "tripped_balance_-0.08rad_fork_overlap_mm3": 1.5837,
  "armed_balance_+0.60rad_fork_overlap_mm3": 0.0,
+ "loading_position_tripped_head_ramp_overlap_mm3": 116.9,
+ "loading_position_armed_head_ramp_overlap_mm3": 0.0,
+ "loading_position_xc": 213.58,
  "sense_travel_mm": 0.35,
  "flag_travel_mm": 6.0,
  "xc": 178.79
